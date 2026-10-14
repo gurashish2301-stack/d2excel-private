@@ -1,0 +1,26 @@
+{
+  "_note": "SAMPLE. Wording copied from linkedin-stat-bank.md section A (rows 1, 2 and 4). Re-open the sources the day you post.",
+  "template": "a",
+  "verified": true,
+  "kicker": "US counselor situation",
+  "title": "The Counselor Gap: Why Students Need More *Support*",
+  "stat": "The average US school counselor served 372 students in 2024-25, nearly 50% above ASCA's recommended 250.",
+  "spokes": [
+    {
+      "icon": "cap",
+      "heading": "Some schools have none",
+      "body": "Federal data for 2020-21 show about 1 in 6 public high schools had no school counselor, affecting about 4% of high school students."
+    },
+    {
+      "icon": "scales",
+      "heading": "Private help has a price",
+      "body": "IECA members reported typical comprehensive packages of $4,000 to $7,500 in 2022."
+    },
+    {
+      "icon": "handshake",
+      "heading": "Where D2Excel fits",
+      "body": "D2Excel is building an open marketplace of counselors, with decision support that isn't gated behind who can afford it."
+    }
+  ],
+  "source": "Sources: ASCA release, Feb 13 2026; K-12 Dive, Feb 23 2026; US Dept of Education OCR, 2020-21 CRDC First Look; IECA State of the Profession, Dec 2022"
+}

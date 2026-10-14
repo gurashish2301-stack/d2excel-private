@@ -1,0 +1,19 @@
+---
+// The truthful split: what is live today (one panel) and what is planned (dashed panel, each item marked as not existing yet).
+import Icon from './Icon.astro';
+const { live, planned = [], note = 'None of these exist yet' } = Astro.props;
+---
+<div class="board">
+  <article class="board-live rise">
+    <p class="mono st st-live">Live today</p>
+    <h3>{live.title}</h3>
+    <p>{live.text}</p>
+    <a class="link-arrow" href={live.href}>{live.label} <Icon name="arrow" /></a>
+  </article>
+  <article class="board-plan rise">
+    <p class="board-head"><span class="mono st st-plan">Planned</span><span class="mono">{note}</span></p>
+    <ul>
+      {planned.map((p) => <li><h3>{p.t}</h3><p>{p.d}</p></li>)}
+    </ul>
+  </article>
+</div>

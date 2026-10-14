@@ -1,0 +1,5 @@
+---
+const { plate = false, height = 46 } = Astro.props;
+const width = Math.round((height * 326) / 248);
+---
+<img class:list={['logo', plate && 'logo-plate']} src="/logo-tight.png" alt="D2Excel" width={width} height={height} decoding="async" />

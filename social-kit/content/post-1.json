@@ -1,0 +1,13 @@
+{
+  "_note": "Batch 2 post 1, caseload gap. Graphic text from linkedin-posts-batch-2.md; source line from the post's own Source line. Re-open the sources the day you post.",
+  "template": "a",
+  "verified": true,
+  "title": "372 students per counselor",
+  "stat": "2024-25, all grades; ASCA recommends 250.",
+  "spokes": [
+    { "icon": "chart", "heading": "The ratio", "body": "Nearly 50% above 250" },
+    { "icon": "calendar", "heading": "The calendar", "body": "Schedules, lists, forms, letters in one year" },
+    { "icon": "compass", "heading": "The reframe", "body": "A structural math problem" }
+  ],
+  "source": "Source: ASCA 2024-25 student-to-counselor ratio data, released Feb 2026 and reported by K-12 Dive."
+}

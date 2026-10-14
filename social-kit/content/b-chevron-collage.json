@@ -1,0 +1,20 @@
+{
+  "_note": "SAMPLE. The Pell figure is wording copied from linkedin-stat-bank.md section C row 5. Add photos by writing a path such as photos/campus.jpg.",
+  "template": "b",
+  "verified": true,
+  "title": "College Guidance",
+  "blocks": [
+    {
+      "heading": "The Real Cost",
+      "body": "The class of 2024 left about $4.4 billion in Pell Grants unclaimed; California and Texas each topped $500 million."
+    },
+    {
+      "heading": "How D2Excel Helps",
+      "body": "We connect students and families to more counselors, more variety, and the information to make a fit-based decision, not a guess."
+    }
+  ],
+  "cta": { "label": "Learn more", "url": "d2excel.com" },
+  "source": "Source: NCAN, Apr 15 2025",
+  "photo": "",
+  "photo2": ""
+}

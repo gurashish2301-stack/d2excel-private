@@ -1,0 +1,37 @@
+---
+// The hero set piece: a tilted wall of the six real guide cards, 3 columns by 2 rows, inside a glowing oval ring.
+// Wrap in <div class="stage" data-v="a">. Every card links to a guide; nothing on the wall is empty or half hidden.
+import { fmtMonth } from '../../config';
+const { guides } = Astro.props;
+const cols = [
+  [guides[0], guides[3]],
+  [guides[1], guides[4]],
+  [guides[2], guides[5]],
+];
+const z = [30, 22, 4, 0, 46, 38];
+let n = 0;
+---
+<div class="hero-art">
+  <i class="ring-halo" aria-hidden="true"></i><i class="ring" aria-hidden="true"></i><i class="ring-ember" aria-hidden="true"></i>
+  <div class="wall" role="group" aria-label="Guides">
+    <div class="wall-plane">
+      <i class="wall-ring3d" aria-hidden="true"></i>
+      {cols.map((col) => (
+        <div class="wall-col">
+          {col.map((s) => {
+            const i = n++;
+            return (
+              <div class="wall-item" style={`--z:${z[i]};--i:${i}`}>
+                <a class="card card-spot" href={`/guides/${s.id}/`}>
+                  <span class="mono topic">{s.data.category}</span>
+                  <span class="card-title">{s.data.title}</span>
+                  <span class="mono lv">Last verified {fmtMonth(s.data.lastVerified)}</span>
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

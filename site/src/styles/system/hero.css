@@ -1,0 +1,87 @@
+/* ---------- hero set piece: the glowing oval ring and the tilted wall of real guide cards ----------
+   Cost model: everything is transform or opacity on composited layers, painted once. The only JS is one
+   perspective-origin write per frame while the cursor moves (src/scripts/system.ts). Scroll drift is CSS-only. */
+.stage { position: relative; isolation: isolate; overflow: clip; }
+
+/* the oval echoes the logo's ring: 159.5 x 120 radii, so 1.33 : 1 */
+.hero-art { position: relative; width: 100%; aspect-ratio: 1.33; }
+.ring, .ring-halo { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
+.ring {
+  --w: 3px; padding: var(--w); z-index: 0;
+  background: conic-gradient(from var(--turn, 200deg), #2a5fe0 0%, #c4d6ff 18%, #5b8cff 38%, #ff5a66 58%, #2a5fe0 76%, #c4d6ff 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.ring-halo {
+  z-index: -1;
+  box-shadow: 0 0 70px 6px rgb(60 110 255 / 0.55), 0 0 160px 30px rgb(0 64 192 / 0.4), inset 0 0 90px 10px rgb(60 110 255 / 0.25);
+}
+/* the single red moment on the screen: a small ember riding the lower left of the ring */
+.ring-ember { position: absolute; left: 21%; top: 78%; width: 14%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, rgb(255 90 102 / 0.65), transparent 68%); filter: blur(10px); pointer-events: none; z-index: 0; }
+
+.wall { position: absolute; inset: 0; perspective: 2200px; perspective-origin: 50% 50%; pointer-events: none; }
+.wall a, .wall .wall-link { pointer-events: auto; }
+.wall-plane {
+  position: absolute; inset: 9% 7%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(0.6rem, 1.4vw, 1.1rem); align-content: center;
+  transform: rotateX(var(--wall-x, 38deg)) rotateZ(var(--wall-z, -12deg)) scale(var(--wall-scale, 0.9)); transform-style: preserve-3d;
+}
+.wall-col { display: grid; gap: clamp(0.9rem, 2vw, 1.5rem); align-content: center; transform-style: preserve-3d; }
+.wall-item { transform: translateZ(calc(var(--z, 0) * 1px)); transform-style: preserve-3d; }
+.wall .card { height: 100%; min-height: 5.75rem; background: rgb(11 26 64 / 0.94); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.wall .card .mono { color: var(--text-2); }
+.wall .card .card-title { font-size: clamp(1rem, 0.9rem + 0.4vw, 1.25rem); }
+.wall .tile { min-height: 5.75rem; padding: var(--s-4); gap: var(--s-3); border-radius: var(--r-lg); }
+.wall .tile .glyph { width: 2.25rem; height: 2.25rem; }
+
+/* scroll drift: alternate columns slide in opposite directions as the stage passes through the viewport */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .wall-col { animation: ds-drift linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    .wall-col:nth-child(odd) { --drift: 36px; }
+    .wall-col:nth-child(even) { --drift: -36px; }
+  }
+  .wall-item { animation: ds-settle var(--dur-scene) var(--ease-out) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+}
+@keyframes ds-drift { from { transform: translate3d(0, var(--drift), 0); } to { transform: translate3d(0, calc(var(--drift) * -1), 0); } }
+@keyframes ds-settle { from { opacity: 0; transform: translateZ(calc(var(--z, 0) * 1px - 180px)); } }
+
+/* variant a: halo. Ring behind, wall bleeds past it and fades out. */
+.stage[data-v='a'] .wall { -webkit-mask-image: radial-gradient(ellipse 76% 78% at 50% 50%, #000 90%, transparent 100%); mask-image: radial-gradient(ellipse 76% 78% at 50% 50%, #000 90%, transparent 100%); }
+/* variant b: portal. The wall is only visible through the oval. */
+.stage[data-v='b'] .wall { clip-path: ellipse(48% 48% at 50% 50%); }
+.stage[data-v='b'] .wall-plane { inset: 4% 2%; --wall-scale: 1.02; }
+/* variant c: the ring lives in the wall's own 3D plane and encircles the grid */
+.stage[data-v='c'] .ring, .stage[data-v='c'] .ring-halo { display: none; }
+.wall-ring3d { display: none; position: absolute; left: 50%; top: 50%; width: 104%; aspect-ratio: 1.33; translate: -50% -50%; border-radius: 50%; border: 3px solid #8fb2ff; box-shadow: 0 0 60px 4px rgb(60 110 255 / 0.6), inset 0 0 60px rgb(60 110 255 / 0.3); transform: translateZ(-30px); }
+.stage[data-v='c'] .wall-ring3d { display: block; }
+.stage[data-v='c'] .wall { -webkit-mask-image: radial-gradient(ellipse 70% 72% at 50% 50%, #000 60%, transparent 100%); mask-image: radial-gradient(ellipse 70% 72% at 50% 50%, #000 60%, transparent 100%); }
+
+/* phones: no cursor, fewer columns, shallower tilt */
+@media (max-width: 46rem) {
+  .hero-art { aspect-ratio: 0.8; }
+  .stage[data-v] .wall { -webkit-mask-image: none; mask-image: none; }
+  .ring, .ring-halo { inset: 3% 0; }
+  .wall-col { gap: 0.7rem; }
+  .wall .card, .wall .tile { min-height: 5rem; }
+  .wall-item { transform: none; }
+  .wall-plane { grid-template-columns: repeat(2, minmax(0, 1fr)); --wall-x: 26deg; --wall-z: -5deg; --wall-scale: 0.88; inset: 12% 9%; }
+  .wall-col:nth-child(3) { display: none; }
+  .wall .card .card-title { font-size: 1rem; }
+  .wall .tile .card-title { font-size: 0.9375rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wall-item, .wall-col { animation: none !important; }
+}
+
+/* hero composition: copy left, art right; art drops below the copy on narrow screens */
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: var(--s-7); align-items: center; padding-block: clamp(7rem, 12vw, 9rem) clamp(4rem, 8vw, 7rem); min-height: min(52rem, 100svh); }
+.hero-art { margin-right: -4%; }
+@media (max-width: 62rem) { .hero-grid { grid-template-columns: minmax(0, 1fr); min-height: 0; } .hero-art { margin-right: 0; max-width: 40rem; justify-self: center; } }
+
+/* arrival: things settle once, in order. Headline words keep full opacity the whole time (readable and LCP-safe). */
+@keyframes arrive { from { opacity: 0; transform: translate3d(0, 18px, 0); } }
+@keyframes arrive-word { from { transform: translate3d(0, 0.32em, 0); } }
+@media (prefers-reduced-motion: no-preference) {
+  .arrive { animation: arrive var(--dur-scene) var(--ease-out) both; animation-delay: calc(var(--i, 0) * var(--stagger) + 120ms); }
+  .arrive.w { animation-name: arrive-word; }
+}

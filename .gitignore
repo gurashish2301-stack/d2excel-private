@@ -1,0 +1,23 @@
+# dependencies and build output
+node_modules/
+dist/
+.astro/
+.vite/
+
+# generated QA evidence (large screenshots and traces); QA-LOG.md keeps the results
+site/qa/
+site/shots/
+social-kit/variants/
+.playwright/
+.playwright-cli/
+
+# secrets and local config
+.env
+.env.*
+*.pem
+*.key
+.impeccable/
+
+# OS and editor
+.DS_Store
+*.log

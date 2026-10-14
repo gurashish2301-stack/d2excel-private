@@ -1,0 +1,14 @@
+---
+// Shared shell for the inner pages (For students, For counselors, How it works, About, Join). Adds WebPage and BreadcrumbList JSON-LD from title and description.
+// SystemLayout (navy pill nav, optional dock, footer, logo reveal) plus the inner-page parts in styles/system/inner.css.
+// Compose a page from: InnerHero, InnerSection (paper band), FeatureRow, LiveBoard, InnerAsk.
+import SystemLayout from './SystemLayout.astro';
+import '../styles/system/inner.css';
+import { pageLd } from '../config';
+// `inner={false}` skips inner.ts (headline settle, magnetic button, tabs) on a page that uses none of it (Join).
+const { title, description, inner = true } = Astro.props;
+---
+<SystemLayout {...Astro.props} jsonLd={pageLd(title, description, Astro.url.pathname)}>
+  <slot />
+  {inner && <script>import '../scripts/inner.ts';</script>}
+</SystemLayout>

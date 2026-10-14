@@ -1,0 +1,19 @@
+---
+// The one waitlist ask that ends an inner page, in the style of the home page's final ask: dark, one primary action, the ring.
+// Title goes in the `title` slot (one accent word); the default slot is an optional small note under the button.
+import Icon from './Icon.astro';
+const { id = 'join', eyebrow = 'Be first to know', lede, cta } = Astro.props;
+const hasNote = Astro.slots.has('default');
+---
+<section id={id} class="section ia seam-top theme-dark glow-field tex-dots" aria-labelledby={`${id}-title`}>
+  <div class="wrap ia-grid">
+    <div class="stack-lg ia-copy">
+      <p class="mono">{eyebrow}</p>
+      <h2 id={`${id}-title`}><slot name="title" /></h2>
+      <p class="lede">{lede}</p>
+      <div class="row"><a class="btn btn-primary" href={cta.href}>{cta.label} <Icon name="arrow" /></a></div>
+      {hasNote && <p class="small ia-note"><slot /></p>}
+    </div>
+    <div class="ia-art" aria-hidden="true"><i class="ring-halo"></i><i class="ring"></i><i class="ring-ember"></i></div>
+  </div>
+</section>

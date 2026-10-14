@@ -1,0 +1,81 @@
+/* ---------- Join: two columns on the inner-page template. Left: what happens next. Right: a calm form card on paper. ---------- */
+.jn { padding-block: clamp(7rem, 11vw, 8.5rem) calc(clamp(3rem, 6vw, 5rem) + var(--seam)); }
+.jn-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-7) clamp(2.5rem, 6vw, 5rem); align-items: start; }
+.jn-copy { display: grid; gap: var(--s-5); justify-items: start; align-content: start; }
+.jn-copy .mono { color: var(--text-2); }
+.jn-title { font-size: clamp(2.25rem, 1.35rem + 2.9vw, 3.5rem); line-height: 1.12; letter-spacing: var(--track-h1); text-wrap: balance; }
+.jn-checks { display: grid; gap: var(--s-3); margin-top: var(--s-2); }
+.jn-checks li { display: flex; align-items: center; gap: var(--s-3); font-size: 1.0625rem; line-height: 1.4; color: var(--text); }
+.jn-check { display: grid; place-items: center; flex: none; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: rgb(91 140 255 / 0.18); border: 1px solid rgb(143 178 255 / 0.45); color: var(--blue-200); }
+.jn-check .ico { width: 1rem; height: 1rem; }
+
+.jn-card { container-type: inline-size; padding: clamp(1.25rem, 3vw, 2.25rem); border-radius: var(--r-xl); background: var(--paper-50); color: var(--text); box-shadow: var(--shadow-2); }
+.jn-notice { display: flex; align-items: center; gap: var(--s-3); width: fit-content; max-width: 100%; margin-bottom: var(--s-5); padding: 0.4rem 0.9rem; border-radius: var(--r-pill); border: 1px dashed var(--paper-500); font-size: var(--t-sm); line-height: 1.4; color: var(--text-2); }
+.jn-notice .st { color: var(--text-2); }
+
+.jn-form { display: grid; gap: var(--s-4); }
+.jn-form .fieldset { gap: var(--s-3); min-width: 0; }
+.jn-form legend { padding: 0; margin-bottom: var(--s-1); }
+.jn-form .hint { font-weight: 400; }
+.jn-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--s-4); align-items: start; }
+.error-msg:empty { display: none; }
+.jn-form .check { padding-block: 0.4rem; font-weight: 400; font-size: var(--t-base); line-height: 1.45; }
+.jn-form .textarea { min-height: 5.5rem; }
+.jn-actions { margin-top: var(--s-1); }
+.jn-status { font-weight: 600; }
+
+/* role cards: real radios inside labels, large targets. The input is visually hidden but focusable; the ring is drawn on the card. */
+.jn-role-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-3); }
+.jn-role { position: relative; justify-items: start; align-content: start; gap: var(--s-1); min-height: 7.5rem; padding: var(--s-4); background: var(--paper-0); border: 1.5px solid var(--field-border); box-shadow: none; cursor: pointer; }
+.jn-role:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-1); }
+.jn-role:has(input:checked) { border-color: var(--blue-600); background: var(--blue-50); box-shadow: 0 0 0 1px var(--blue-600); }
+.jn-role:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+.jn-role .ic-tile { margin-bottom: var(--s-2); }
+.jn-role-t { font-weight: 600; font-size: 1.0625rem; line-height: 1.25; letter-spacing: -0.01em; color: var(--text); }
+.jn-role .hint { line-height: 1.35; }
+.jn-tick { position: absolute; top: var(--s-3); right: var(--s-3); display: grid; place-items: center; width: 1.375rem; height: 1.375rem; border-radius: 50%; border: 1.5px solid var(--paper-500); background: var(--paper-0); color: transparent; transition: background-color var(--dur-fast) var(--ease-std), border-color var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std); }
+.jn-tick .ico { width: 0.8rem; height: 0.8rem; }
+.jn-role:has(input:checked) .jn-tick { background: var(--blue-600); border-color: var(--blue-600); color: #fff; }
+@container (max-width: 27rem) {
+  .jn-role-grid { grid-template-columns: minmax(0, 1fr); }
+  .jn-role { grid-template-columns: auto minmax(0, 1fr); column-gap: var(--s-4); row-gap: 0; align-items: center; min-height: 4.5rem; padding-block: var(--s-3); }
+  .jn-role .ic-tile { grid-row: span 2; margin: 0; }
+  .jn-role-t, .jn-role .hint { grid-column: 2; }
+}
+
+/* the conditional field. Where :has() is missing both stay visible, so nothing is lost. */
+@supports selector(:has(*)) {
+  .jn-cond { display: none; }
+  .jn-form:has(input[value='student']:checked, input[value='parent']:checked) .jn-cond-process,
+  .jn-form:has(input[value='counselor']:checked) .jn-cond-practice { display: grid; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .jn-cond { --rise: 10px; animation: ds-rise var(--dur-slow) var(--ease-out) both; }
+}
+
+/* focus glow: a soft halo around the focused field, on top of the 3px ring */
+.jn-form .input:focus-visible, .jn-form .select:focus-visible, .jn-form .textarea:focus-visible { box-shadow: 0 0 0 7px rgb(0 64 192 / 0.13); }
+.jn-form .input:user-invalid, .jn-form .textarea:user-invalid { border-color: var(--err); }
+
+/* one pass of the button sweep when the form is sent (the hover and focus sweep is in inner.css) */
+@media (prefers-reduced-motion: no-preference) {
+  main .btn-primary.is-sending::after { opacity: 1; animation: ds-sweep 0.8s var(--ease-out) 1 both; }
+}
+
+/* states: error summary under the button, success in place of the form */
+.jn-sent { display: none; justify-items: start; gap: var(--s-4); outline: none; }
+.jn-sent p { color: var(--text-2); max-width: 40ch; }
+.jn-sent-mark { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--ok-100); border: 1.5px solid var(--ok-700); color: var(--ok-700); }
+.jn-sent-mark .ico { width: 1.5rem; height: 1.5rem; }
+.jn-sent-title { font-size: var(--t-h3); line-height: 1.15; }
+.jn-sent:target, .jn-card.is-sent .jn-sent { display: grid; }
+@media (prefers-reduced-motion: no-preference) {
+  .jn-sent:target, .jn-card.is-sent .jn-sent { --rise: 14px; animation: ds-rise var(--dur-slow) var(--ease-out) both; }
+}
+.jn-card.is-sent .jn-form { display: none; }
+@supports selector(:has(*)) { .jn-card:has(.jn-sent:target) .jn-form { display: none; } }
+
+@media (max-width: 62rem) {
+  .jn-grid { grid-template-columns: minmax(0, 1fr); }
+  .jn-card { max-width: 38rem; }
+}

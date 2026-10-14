@@ -1,0 +1,187 @@
+/* D2Excel design system, direction C (Hybrid). Raw values first, then the semantic roles that components read. */
+:root {
+  /* ---- brand: the logo's own blue and red ---- */
+  --blue-950: #00123d;
+  --blue-800: #00257a;
+  --blue-700: #0033a0;
+  --blue-600: #0040c0;   /* logo blue */
+  --blue-500: #2a5fe0;
+  --blue-400: #5b8cff;
+  --blue-300: #8fb2ff;
+  --blue-200: #c4d6ff;
+  --blue-100: #e3ecff;
+  --blue-50:  #f1f5ff;
+  /* the logo's red (sampled from public/logo-tight.png: the "2" is #e41026 at its most common, rounded to #e01020 the way the blue
+     #0147c5 became #0040c0) with a ramp like the blue's:
+     50 to 200 tints and backgrounds, 300 and 400 on navy, 500 mid, 600 the logo, 700 and 800 deep (text on paper) */
+  --red-950: #2f0309;
+  --red-900: #5a0610;
+  --red-800: #850a14;
+  --red-700: #b00d1a;    /* red text on light, 6.9:1 on paper */
+  --red-600: #e01020;    /* logo red; white text on it is 4.9:1 */
+  --red-500: #f0303f;
+  --red-400: #ff5a66;    /* red text on navy, 6.4:1 */
+  --red-300: #ff8f98;
+  --red-200: #ffc4ca;
+  --red-100: #ffe1e4;
+  --red-50:  #fff1f2;
+
+  /* ---- navy: dark surfaces ---- */
+  --navy-1000: #030617;
+  --navy-950: #050b24;
+  --navy-900: #08122e;
+  --navy-850: #0b1a40;
+  --navy-800: #0f2255;
+  --navy-700: #16306f;
+  --navy-line: rgb(150 180 255 / 0.16);
+  --navy-line-strong: rgb(150 180 255 / 0.3);
+
+  /* ---- paper: warm neutrals for the light reading sections ---- */
+  --paper-0: #ffffff;
+  --paper-50: #fbfaf6;
+  --paper-100: #f5f2ea;
+  --paper-200: #ebe7db;
+  --paper-300: #dcd6c6;
+  --paper-400: #bdb6a3;
+  --paper-500: #8b8573;
+  --paper-600: #655f50;
+  --paper-900: #1c1a14;
+
+  /* ink on paper: navy-tinted so text ties back to the brand */
+  --ink-1: #0b1430;
+  --ink-2: #2b3450;
+  --ink-3: #4f5a75;
+
+  /* ---- status ---- */
+  --ok-700: #0d6b36;   --ok-100: #dff3e6;
+  --warn-800: #7a4e00; --warn-100: #fff1cc;
+
+  /* ---- type ---- */
+  --font-sans: 'Geist Variable', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --t-micro: 0.75rem;                                       /* mono labels; never smaller than 12px */
+  --t-sm: 0.875rem;
+  --t-base: 1rem;
+  --t-read: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem);   /* article body */
+  --t-lede: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+  --t-h4: 1.25rem;
+  --t-h3: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+  --t-h2: clamp(1.875rem, 1.4rem + 2.2vw, 3.25rem);
+  --t-h1: clamp(2.5rem, 1.6rem + 4.4vw, 5rem);
+  --t-display: clamp(3rem, 1.8rem + 6vw, 6rem);              /* cap 96px */
+
+  --track-display: -0.04em;
+  --track-h1: -0.035em;
+  --track-h2: -0.03em;
+  --track-h3: -0.02em;
+  --track-mono: 0.08em;
+
+  /* ---- space: 4px base ---- */
+  --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem;
+  --s-6: 2rem; --s-7: 3rem; --s-8: 4rem; --s-9: 6rem; --s-10: 8rem;
+  --section-y: clamp(4rem, 3rem + 5vw, 8rem);
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --wrap: 1200px;
+  --measure: 66ch;
+  --tap: 2.75rem;        /* 44px minimum target */
+
+  /* ---- shape ---- */
+  --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+  --seam: clamp(1.5rem, 4vw, 3.5rem);
+
+  /* ---- motion: one language. Arrive with expo-out, settle, never loop. ---- */
+  --dur-instant: 100ms;
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 560ms;
+  --dur-scene: 900ms;
+  --stagger: 60ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);       /* arrivals and reveals (GSAP: expo.out) */
+  --ease-std: cubic-bezier(0.2, 0.7, 0.2, 1);      /* hover, press and small state changes (power3.out) */
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);   /* page and seam moves (expo.inOut) */
+
+  /* ---- z layers ---- */
+  --z-content: 1; --z-dock: 40; --z-nav: 50; --z-skip: 100;
+}
+
+/* ---- semantic roles. Components read these, never the raw values above. ---- */
+.theme-dark {
+  color-scheme: dark;
+  --bg: var(--navy-950);
+  --bg-raised: var(--navy-900);
+  --surface: rgb(255 255 255 / 0.05);
+  --surface-hover: rgb(255 255 255 / 0.09);
+  --surface-solid: var(--navy-850);
+  --border: var(--navy-line);
+  --border-strong: var(--navy-line-strong);
+  --text: #f5f8ff;
+  --text-2: #c3cfe8;
+  --text-3: #93a3c7;
+  --accent: var(--blue-300);          /* links and highlights on dark */
+  --accent-strong: #ffffff;
+  --accent-red: var(--red-400);       /* red text on navy */
+  --red-mark: var(--red-500);         /* red strokes, dots and fills (never the only carrier of meaning) */
+  --red-tint: rgb(255 90 102 / 0.14);
+  --red-line: rgb(255 90 102 / 0.55);
+  --red-glow: rgb(224 16 32 / 0.5);
+  --btn-bg: var(--blue-500);
+  --btn-bg-hover: #3c70f0;
+  --btn-fg: #ffffff;
+  --focus: #ffffff;
+  --focus-halo: 0 0 0 6px rgb(91 140 255 / 0.45);
+  --glow: rgb(91 140 255 / 0.55);
+  --accent-word: var(--blue-200);
+  --spot: rgb(91 140 255 / 0.2);
+  --glass-bg: rgb(255 255 255 / 0.05);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  --card-blur: blur(10px);
+  --btn-hover-glow: 0 0 32px -6px rgb(91 140 255 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.28);
+  --sel-bg: var(--blue-400); --sel-fg: var(--navy-1000);
+  --shadow-1: 0 1px 0 rgb(255 255 255 / 0.07) inset, 0 12px 28px -14px rgb(0 0 0 / 0.7);
+  --shadow-2: 0 1px 0 rgb(255 255 255 / 0.1) inset, 0 28px 60px -24px rgb(0 0 0 / 0.8), 0 0 48px -16px var(--glow);
+  --field-bg: rgb(255 255 255 / 0.06);
+  --field-border: rgb(150 180 255 / 0.4);
+  --err: #ff8f98;
+  --ok: #6ee7a0;
+}
+.theme-light {
+  color-scheme: light;
+  --bg: var(--paper-50);
+  --bg-raised: var(--paper-0);
+  --surface: var(--paper-0);
+  --surface-hover: var(--paper-0);
+  --surface-solid: var(--paper-0);
+  --border: var(--paper-200);
+  --border-strong: var(--paper-300);
+  --text: var(--ink-1);
+  --text-2: var(--ink-2);
+  --text-3: var(--ink-3);
+  --accent: var(--blue-600);
+  --accent-strong: var(--blue-700);
+  --accent-red: var(--red-700);       /* red text on paper */
+  --red-mark: var(--red-600);
+  --red-tint: var(--red-50);
+  --red-line: var(--red-300);
+  --red-glow: rgb(224 16 32 / 0.25);
+  --btn-bg: var(--blue-600);
+  --btn-bg-hover: var(--blue-700);
+  --btn-fg: #ffffff;
+  --focus: var(--blue-600);
+  --focus-halo: 0 0 0 0 transparent;
+  --glow: rgb(0 64 192 / 0.22);
+  --accent-word: var(--blue-600);
+  --spot: rgb(0 64 192 / 0.1);
+  --glass-bg: var(--paper-0);
+  --glass-shadow: var(--shadow-1);
+  --card-blur: none;
+  --btn-hover-glow: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --sel-bg: var(--blue-600); --sel-fg: #fff;
+  --shadow-1: 0 1px 2px rgb(11 20 48 / 0.06), 0 8px 18px -10px rgb(11 20 48 / 0.16);
+  --shadow-2: 0 2px 4px rgb(11 20 48 / 0.05), 0 22px 44px -20px rgb(11 20 48 / 0.32);
+  --field-bg: var(--paper-0);
+  --field-border: var(--paper-500);
+  --err: var(--red-700);
+  --ok: var(--ok-700);
+}

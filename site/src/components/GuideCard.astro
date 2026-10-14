@@ -1,0 +1,14 @@
+---
+import Arrow from './Arrow.astro';
+import { GUIDE_ORDER } from '../config';
+const { guide, feature = false, d = 0 } = Astro.props;
+const r = (Math.max(0, GUIDE_ORDER.indexOf(guide.id)) * 47) % 180;
+---
+<a class:list={['card', 'spot', feature && 'feature', 'reveal']} href={`/guides/${guide.id}/`} style={`--r:${r}deg;--d:${d}`}>
+  <h3>{guide.data.title}</h3>
+  <p>{guide.data.description}</p>
+  <span class="foot">
+    <span class="topic">{guide.data.category}</span>
+    <span class="go">Read the guide <Arrow /></span>
+  </span>
+</a>

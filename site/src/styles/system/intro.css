@@ -1,0 +1,49 @@
+/* ---------- logo reveal (every fresh arrival at Home; the first page of a session elsewhere) ----------
+   Phase 1 is pure CSS so it starts on first paint: the plate rises, a blue and a red arc leave the top of the ring and draw round it
+   in opposite directions, the logo's own ring draws and the D2E wipes in, the two arcs meet at the bottom (a flash) and the 2 pulses red.
+   Phase 2 (scripts/intro.ts) flies the logo into the nav and splits the curtain.
+   The overlay only exists while <html class="intro"> is set by the head script (motion allowed, first page, JavaScript on).
+   A CSS animation hides it after 6 seconds even if every script fails. */
+.curtain { display: none; }
+html.intro .curtain {
+  --il: min(44vw, 290px);
+  display: block; position: fixed; inset: 0; z-index: 300; overflow: hidden; cursor: pointer; touch-action: none;
+  animation: intro-failsafe 0s 6s forwards;
+}
+html.intro .nav-top .logo-plate { opacity: 0; }
+/* page content that animates on arrival waits for the curtain to open (see .arrive in home.css) */
+html.intro:not(.intro-open) .arrive, html.intro:not(.intro-open) .arrive * { animation-play-state: paused; }
+
+.intro-panel { position: absolute; top: 0; bottom: 0; width: 50.2%; background-color: var(--navy-950); will-change: transform; }
+.intro-l { left: 0; background-image: radial-gradient(60vmax 46vmax at 100% 50%, rgb(0 64 192 / 0.5), transparent 72%); }
+.intro-r { right: 0; background-image: radial-gradient(60vmax 46vmax at 0% 50%, rgb(0 64 192 / 0.5), transparent 72%); }
+
+.intro-logo { position: absolute; left: 50%; top: 50%; width: var(--il); aspect-ratio: 326 / 248; margin: calc(var(--il) * -0.38) 0 0 calc(var(--il) / -2); }
+/* the plate is the same oval as the nav's logo plate (30% side and 17% top padding), so the flight ends exactly on it */
+.intro-logo::before {
+  content: ''; position: absolute; inset: -17% -30%; border-radius: 50%; background: #fff;
+  animation: intro-plate 0.55s 0.05s var(--ease-out) both;
+}
+.intro-core { position: absolute; inset: 0; animation: intro-settle 0.85s 0.3s var(--ease-out) both; }
+.intro-core img, .intro-core svg { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+.intro-core img { animation: intro-wipe 0.6s 0.55s var(--ease-in-out) both; }
+.intro-core svg { overflow: visible; }
+.intro-ring { fill: none; stroke: #0641c9; stroke-width: 5; stroke-dasharray: 1; animation: intro-draw 0.75s 0.2s var(--ease-in-out) both; }
+.intro-echo { position: absolute; inset: -40% -52%; width: 204%; max-width: none; height: 180%; overflow: visible; }
+.intro-echo path { fill: none; stroke-width: 2.25; stroke-linecap: round; stroke-dasharray: 0.5 2; stroke-dashoffset: 0.52; opacity: 0; animation: intro-arc 1.2s 0.1s var(--ease-in-out) both; }
+.intro-echo .e-blue { stroke: var(--blue-300); }
+.intro-echo .e-red { stroke: var(--red-400); }
+.intro-pulse {
+  position: absolute; left: 51.5%; top: 49.8%; width: 30%; aspect-ratio: 1; margin: -15% 0 0 -15%; border-radius: 50%;
+  border: 3px solid var(--red-600); box-shadow: 0 0 36px 6px rgb(224 16 32 / 0.45); opacity: 0;
+  animation: intro-pulse 0.8s 0.95s var(--ease-out) forwards;
+}
+
+@keyframes intro-failsafe { to { visibility: hidden; pointer-events: none; } }
+@keyframes intro-plate { from { opacity: 0; transform: scale(0.88); } }
+@keyframes intro-settle { from { filter: blur(9px); transform: scale(1.07); } }
+@keyframes intro-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes intro-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+/* the two arcs draw to the bottom of the ring, flare white where they meet (about 1s in) and fade as the flight starts */
+@keyframes intro-arc { 0% { stroke-dashoffset: 0.52; opacity: 1; } 72% { stroke-dashoffset: 0; stroke-width: 2.25; opacity: 1; } 84% { stroke: #fff; stroke-width: 3.5; opacity: 1; } 100% { stroke: #fff; stroke-dashoffset: 0; stroke-width: 3.5; opacity: 0; } }
+@keyframes intro-pulse { 0% { opacity: 0.95; transform: scale(0.35); } 100% { opacity: 0; transform: scale(2.4); } }

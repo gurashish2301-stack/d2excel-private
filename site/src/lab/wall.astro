@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import SystemLayout from '../layouts/SystemLayout.astro';
+import GuideWall from '../components/system/GuideWall.astro';
+import { sortGuides } from '../config';
+
+const guides = sortGuides(await getCollection('guides'));
+// 4 columns x 3 rows: six real guide cards and six flat illustrated tiles (decorative, hidden from assistive tech)
+---
+<SystemLayout intro={false} title="Spike: guide wall" description="Private design lab." noindex scripts={true} footer={false}>
+  <section class="stage theme-dark glow-field tex-dots" data-v="a" aria-labelledby="t">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="mono" style="margin-bottom:1rem">Spike: wall variant <span data-vname>a</span></p>
+        <h1 id="t" class="display" style="font-size:clamp(2.5rem,1.6rem + 3.6vw, 4.25rem)">Start with clear answers. Find the <span class="accent">right counselor</span> next.</h1>
+        <p class="lede" style="margin-top:1.25rem">Plain-language, sourced college guides for California students, free today.</p>
+        <div class="row" style="margin-top:2rem">
+          <a class="btn btn-primary" href="/guides/">Read the guides</a>
+          <a class="btn btn-glass" href="/join/">Join the waitlist</a>
+        </div>
+        <div class="row" style="margin-top:2rem">
+          <a class="chip chip-mono" href="?v=a">a: halo</a><a class="chip chip-mono" href="?v=b">b: portal</a><a class="chip chip-mono" href="?v=c">c: 3D ring</a>
+        </div>
+      </div>
+      <GuideWall guides={guides} />
+    </div>
+  </section>
+  <script is:inline>
+    (function(){var v=new URLSearchParams(location.search).get('v')||'a';var s=document.querySelector('.stage');s.dataset.v=v;document.querySelector('[data-vname]').textContent=v;})();
+  </script>
+</SystemLayout>

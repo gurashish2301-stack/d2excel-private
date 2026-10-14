@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>D2Excel post C: editorial big type</title>
+<link rel="stylesheet" href="../brand.css">
+<style>
+  :root {
+    --photo-top: 488px;
+    --photo-h: calc(340px + (var(--h) - 1200px) * 0.6);
+    --band-h: 124px;
+  }
+  .c { background: var(--paper-50); color: var(--ink-1); }
+
+  .top { position: absolute; left: 0; top: 0; width: 1200px; background: var(--blue-100);
+    height: calc(var(--photo-top) + var(--photo-h) * 0.5); }
+  .c .logo { position: absolute; left: 50%; top: 44px; width: 190px; transform: translateX(-50%); }
+
+  .head { position: absolute; left: var(--margin); top: 192px; width: 1072px; height: 248px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .head h1 { font: 300 120px/1 var(--font-sans); letter-spacing: -0.05em; text-wrap: balance; max-height: 2.04em; }
+  .head .accent { font-size: 1.08em; letter-spacing: -0.02em; color: var(--blue-600); }
+  .rule { position: absolute; left: var(--margin); top: 458px; width: 1072px; height: 2px; background: var(--ink-1); }
+
+  .photo { position: absolute; left: 120px; top: calc(var(--photo-top) + 4px); width: 770px; height: var(--photo-h); }
+
+  .chev { position: absolute; left: 990px; top: calc(var(--photo-top) + var(--photo-h) * 0.5 - 20px); width: 110px; }
+
+  .copy { position: absolute; left: 120px; top: calc(var(--photo-top) + var(--photo-h) + 40px); width: 960px; }
+  .copy p { font: 400 31px/1.45 var(--font-sans); color: var(--ink-2); text-wrap: pretty; }
+  .copy .src { font: 400 24px/1.4 var(--font-mono); margin-top: 20px; color: var(--ink-3); }
+
+  .c:has(.band[hidden]) { --photo-h: calc(440px + (var(--h) - 1200px) * 0.8); }
+  .tall .copy p { font-size: 35px; }
+  .band { position: absolute; left: 0; bottom: 0; width: 1200px; height: var(--band-h); background: var(--blue-200);
+    display: flex; align-items: center; padding: 0 var(--margin); font: 650 32px/1.2 var(--font-sans); letter-spacing: -0.01em; color: var(--ink-1); }
+  .band .handle { margin-left: auto; }
+</style>
+</head>
+<body>
+<main class="slide c">
+  <div class="top"></div>
+  <img class="logo" src="../assets/logo-tight.png" alt="D2Excel">
+  <div class="head"><h1 data-f="headline" data-fit="72,120" data-min="72"></h1></div>
+  <div class="rule"></div>
+
+  <div class="slot photo" data-photo="photo" data-pos="photo_position"><div class="pattern"></div></div>
+  <svg class="chev" viewBox="0 0 110 120" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M14 56 L55 14 L96 56" stroke="var(--ink-1)" stroke-width="22"/>
+    <path d="M14 104 L55 62 L96 104" stroke="var(--blue-300)" stroke-width="22"/>
+  </svg>
+
+  <section class="copy">
+    <p data-f="body"></p>
+    <p class="src" data-f="source" data-min="24"></p>
+  </section>
+
+  <footer class="band" data-show="url|handle">
+    <span class="url" data-f="url" data-min="28"></span>
+    <span class="handle" data-f="handle" data-min="28"></span>
+  </footer>
+</main>
+<script src="../fill.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+---
+import { NAV } from '../../config';
+const path = Astro.url.pathname;
+---
+<header class="nav-top">
+  <div class="nav-bar">
+    <a class="nav-brand" href="/" aria-label="D2Excel home"><span class="logo-plate"><img src="/logo-tight.png" width="326" height="248" alt="" decoding="async" /></span></a>
+    <nav class="nav-links" id="nav-links" aria-label="Main">
+      {NAV.map((n) => <a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a>)}
+    </nav>
+    <div class="nav-end">
+      <a class="btn btn-primary btn-sm" href="/join/">Join the waitlist</a>
+      <button class="nav-menu" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,105 @@
+/* ---------- reset and page ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-tap-highlight-color: rgb(0 64 192 / 0.14); -webkit-text-size-adjust: 100%; scroll-padding-block: 6rem 6.5rem; }
+body {
+  margin: 0; background: var(--navy-950); color: var(--text);
+  font: 400 var(--t-base)/1.55 var(--font-sans); font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+img, svg, canvas { display: block; max-width: 100%; }
+h1, h2, h3, h4, p, ul, ol, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: var(--accent); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a, button, input, select, textarea, summary { touch-action: manipulation; }
+::selection { background: var(--sel-bg, var(--blue-600)); color: var(--sel-fg, #fff); }
+[hidden] { display: none !important; }
+html { scrollbar-color: var(--blue-500) var(--navy-900); }
+input, textarea, select { caret-color: var(--accent); accent-color: var(--blue-600); }
+
+/* ---------- focus: always visible, two rings so it reads on any background ---------- */
+:focus-visible { outline: 3px solid var(--focus, var(--blue-600)); outline-offset: 3px; border-radius: var(--r-xs); }
+:focus-visible { box-shadow: var(--focus-halo, none); }
+.skip-link {
+  position: fixed; z-index: var(--z-skip); left: var(--s-4); top: var(--s-3);
+  padding: var(--s-3) var(--s-4); border-radius: var(--r-pill); background: #fff; color: var(--ink-1);
+  font-weight: 600; text-decoration: none; transform: translateY(-250%);
+}
+.skip-link:focus { transform: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: clip; clip-path: inset(50%); white-space: nowrap; }
+
+/* ---------- type roles ---------- */
+.display, .h1, .h2, .h3 { font-family: var(--font-sans); font-weight: 600; color: var(--text); text-wrap: balance; }
+.display { font-size: var(--t-display); line-height: 0.98; letter-spacing: var(--track-display); }
+.h1, h1 { font-size: var(--t-h1); line-height: 1.02; letter-spacing: var(--track-h1); }
+.h2, h2 { font-size: var(--t-h2); line-height: 1.08; letter-spacing: var(--track-h2); }
+.h3, h3 { font-size: var(--t-h3); line-height: 1.2; letter-spacing: var(--track-h3); }
+h1, h2, h3, h4 { font-weight: 600; color: var(--text); text-wrap: balance; }
+h4 { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -0.01em; }
+.lede { font-size: var(--t-lede); line-height: 1.5; color: var(--text-2); max-width: 46ch; text-wrap: pretty; }
+p { text-wrap: pretty; }
+/* the serif-italic accent word: one per headline, never a whole sentence */
+.accent { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; font-size: 1.1em; line-height: 0.9; }
+.accent { color: var(--accent-word); }
+/* monospace micro-label: dates, sources, tags. Data and measurement, not decoration. */
+.mono {
+  font: 500 var(--t-micro)/1.4 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase;
+  color: var(--text-3); font-variant-numeric: tabular-nums;
+}
+.muted { color: var(--text-2); }
+
+/* ---------- layout ---------- */
+.wrap { width: min(var(--wrap), 100% - 2 * var(--gutter)); margin-inline: auto; }
+.wrap-read { width: min(calc(var(--measure) + 2 * var(--gutter)), 100%); padding-inline: var(--gutter); margin-inline: auto; }
+.section { position: relative; background: var(--bg); color: var(--text); padding-block: var(--section-y); }
+.stack > * + * { margin-top: var(--s-4); }
+.stack-lg > * + * { margin-top: var(--s-6); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); }
+.grid { display: grid; gap: var(--s-5); }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+.section-head { display: grid; gap: var(--s-4); max-width: 46rem; margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+
+/* ---------- section seams: dark to light, light to dark ---------- */
+/* A section that overlaps the one above with rounded top corners. The section above needs at least --seam of bottom padding, which .section already provides. */
+.seam-top { position: relative; z-index: var(--z-content); margin-top: calc(var(--seam) * -1); border-radius: var(--seam) var(--seam) 0 0; }
+/* dark to light: the ring's glow bleeds up across the join, so the edge reads as light, not a cut */
+.seam-top.theme-light { box-shadow: 0 -1px 0 rgb(143 178 255 / 0.55), 0 -20px 56px -18px rgb(91 140 255 / 0.55); }
+/* light to dark: a hairline highlight so the navy has an edge against paper */
+.seam-top.theme-dark { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1); }
+
+/* dark atmosphere: static glow field plus a quiet dot texture (no motion, no cost beyond one paint) */
+.glow-field {
+  background:
+    radial-gradient(60% 55% at 78% 8%, rgb(0 64 192 / 0.55), transparent 70%),
+    radial-gradient(45% 40% at 8% 100%, rgb(224 16 32 / 0.22), transparent 70%),
+    var(--navy-950);
+}
+.tex-dots { position: relative; isolation: isolate; }
+.tex-dots::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(rgb(143 178 255 / 0.28) 1px, transparent 1.4px); background-size: 16px 16px;
+  -webkit-mask-image: radial-gradient(75% 70% at 70% 0%, #000, transparent 75%); mask-image: radial-gradient(75% 70% at 70% 0%, #000, transparent 75%);
+}
+
+/* ---------- reveal on scroll: visible by default, CSS scroll-driven where supported ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .reveal { animation: ds-reveal var(--ease-out) both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+  }
+}
+@keyframes ds-reveal { from { opacity: 0; transform: translate3d(0, 24px, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* a quieter glow for long dark sections */
+.glow-field-soft {
+  background:
+    radial-gradient(55% 32% at 88% 0%, rgb(0 64 192 / 0.4), transparent 70%),
+    radial-gradient(40% 30% at 4% 55%, rgb(0 64 192 / 0.2), transparent 70%),
+    var(--navy-950);
+}

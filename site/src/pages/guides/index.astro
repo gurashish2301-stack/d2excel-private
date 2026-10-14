@@ -1,0 +1,107 @@
+---
+import { getCollection, render } from 'astro:content';
+import SystemLayout from '../../layouts/SystemLayout.astro';
+import Icon from '../../components/system/Icon.astro';
+import '../../styles/system/guides.css';
+import { SITE_URL, categoryLook, fmtMonth, readMinutes, slugify, sortGuides } from '../../config';
+
+const guides = sortGuides(await getCollection('guides'));
+const items = await Promise.all(guides.map(async (g) => {
+  const { headings } = await render(g);
+  // A guide "has key dates" when it has a heading about dates; the card then links straight to that section.
+  const dates = headings.find((h) => h.depth === 2 && /dates/i.test(h.text));
+  return { g, dates, cat: slugify(g.data.category), ...categoryLook(g.data.category), min: readMinutes(g.body) };
+}));
+const cats = [...new Map(items.map((i) => [i.cat, i.g.data.category])).entries()];
+const deck = items.slice(0, 3);
+const total = guides.length;
+const filterCss = cats.map(([s]) => `.gh-page:has(#f-${s}:checked) .gh-card:not([data-cat="${s}"]){display:none}`).join('');
+const collection = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Guides',
+  url: new URL('/guides/', SITE_URL).href,
+  mainEntity: { '@type': 'ItemList', itemListElement: guides.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: new URL(`/guides/${g.id}/`, SITE_URL).href, name: g.data.title })) },
+};
+---
+<SystemLayout
+  title="Guides"
+  description="Plain-language guides on the University of California application, SAT or ACT, paying for college, majors, AI in applications, and choosing a college counselor. Each names its sources and when it was last checked."
+  jsonLd={[collection]}
+>
+  <style set:html={filterCss}></style>
+  <div class="gh-page">
+    <section class="gh stage theme-dark glow-field tex-dots" aria-labelledby="gh-title">
+      <div class="wrap gh-grid">
+        <div class="gh-copy">
+          <p class="mono gh-eyebrow arrive" style="--i:0">Free to read <span aria-hidden="true">/</span> {total} guides</p>
+          <h1 id="gh-title" class="display gh-title arrive w" style="--i:1">Guides for the big <span class="accent">decisions</span>.</h1>
+          <p class="lede arrive" style="--i:2">Short, plain-language articles on applying to college. Every guide names its sources and says when it was last checked.</p>
+          <p class="mono gh-order arrive" style="--i:3">Soonest deadline first</p>
+        </div>
+        <div class="gh-art" aria-hidden="true">
+          <i class="ring-halo"></i><i class="ring"></i><i class="ring-ember"></i>
+          <ol class="deck">
+            {deck.map(({ g, tile, icon }, i) => (
+              <li class="deck-item" style={`--i:${i}`}>
+                <a class="card card-spot" href={`/guides/${g.id}/`} tabindex="-1">
+                  <span class={`deck-glyph ${tile}`}><Icon class="ico" name={icon} stroke={1.6} /></span>
+                  <span class="mono">{g.data.category}</span>
+                  <span class="card-title">{g.data.title}</span>
+                  <span class="mono lv">Last verified {fmtMonth(g.data.lastVerified)}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="section gh-list-section seam-top theme-light" aria-label="All guides">
+      <div class="wrap gh-wrap">
+        <fieldset class="gh-filter">
+          <legend class="mono">Filter by topic</legend>
+          <div class="gh-chips">
+            <input class="sr-only" type="radio" name="topic" id="f-all" checked />
+            <label class="chip" for="f-all">All</label>
+            {cats.map(([s, name]) => (
+              <>
+                <input class="sr-only" type="radio" name="topic" id={`f-${s}`} />
+                <label class="chip" for={`f-${s}`}>{name}</label>
+              </>
+            ))}
+          </div>
+        </fieldset>
+
+        <ol class="gh-list">
+          {items.map(({ g, dates, cat, tile, icon, min }) => (
+            <li class="gh-card" data-cat={cat}>
+              <article class="gh-item">
+                <div class={`gh-tile tile ${tile}`} aria-hidden="true">
+                  <Icon class="glyph" name={icon} stroke={1.5} />
+                  <span class="mono">{g.data.category}</span>
+                </div>
+                <div class="gh-body">
+                  {(dates || g.data.status === 'needs-review') && (
+                    <p class="gh-tags">
+                      {dates && <span class="tag tag-dates">Key dates inside</span>}
+                      {g.data.status === 'needs-review' && <span class="tag tag-review">Under review</span>}
+                    </p>
+                  )}
+                  <h2 class="gh-name"><a class="stretch" href={`/guides/${g.id}/`}>{g.data.title}</a></h2>
+                  <p class="gh-desc">{g.data.description}</p>
+                  <p class="mono gh-meta">
+                    <span>Last verified {fmtMonth(g.data.lastVerified)}</span>
+                    <span>{min} min read</span>
+                  </p>
+                  {dates && <a class="gh-jump" href={`/guides/${g.id}/#${dates.slug}`}>Jump to the key dates <Icon name="arrow" /></a>}
+                </div>
+              </article>
+            </li>
+          ))}
+        </ol>
+        <p class="mono gh-count">Showing <span class="gh-n"></span> of {total} guides</p>
+      </div>
+    </section>
+  </div>
+</SystemLayout>

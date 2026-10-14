@@ -1,0 +1,94 @@
+---
+import { getCollection, render } from 'astro:content';
+import SystemLayout from '../../layouts/SystemLayout.astro';
+import '../../styles/system/article.css';
+import { SITE_NAME, SITE_URL, fmtMonth, readMinutes, sortGuides } from '../../config';
+
+export async function getStaticPaths() {
+  const guides = sortGuides(await getCollection('guides'));
+  return guides.map((guide, i) => ({ params: { slug: guide.id }, props: { guide, prev: guides[i - 1], next: guides[i + 1] } }));
+}
+
+const { guide, prev, next } = Astro.props;
+const { data } = guide;
+const { Content, headings, remarkPluginFrontmatter: fm } = await render(guide);
+const toc = [...(fm.hasQuick ? [{ slug: 'quick-answer', text: 'Quick answer' }] : []), ...headings.filter((h) => h.depth === 2)];
+const url = new URL(`/guides/${guide.id}/`, SITE_URL).href;
+const review = data.status === 'needs-review';
+const kicker = fm.kicker || data.category;
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: data.title,
+  description: data.description,
+  dateModified: data.lastVerified,
+  inLanguage: 'en',
+  mainEntityOfPage: url,
+  image: new URL('/og.png', SITE_URL).href,
+  author: { '@type': 'Organization', name: SITE_NAME },
+  publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+};
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL + '/' },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: new URL('/guides/', SITE_URL).href },
+    { '@type': 'ListItem', position: 3, name: data.title },
+  ],
+};
+---
+<SystemLayout title={data.title} description={data.description} ogType="article" jsonLd={[article, breadcrumb]}>
+  <div class="article-page theme-light">
+    <header class="ah">
+      <div class="a-col">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="/">Home</a></li>
+            <li><a href="/guides/">Guides</a></li>
+          </ol>
+        </nav>
+        <p class="mono ah-kicker">{kicker}</p>
+        <h1 class="ah-title">{data.title}</h1>
+        <ul class="ah-meta">
+          <li class="verified"><span class="mono">Last verified {fmtMonth(data.lastVerified)}</span></li>
+          <li><span class="mono">{readMinutes(guide.body)} min read</span></li>
+          {review && <li><span class="tag tag-review">Under review</span></li>}
+        </ul>
+      </div>
+    </header>
+
+    <div class="a-body">
+      <div class="a-col">
+        <details class="toc toc-inline">
+          <summary>On this page</summary>
+          <ul>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+        </details>
+        <div class="article-layout">
+          <article class="prose">
+            {review && (
+              <div class="callout callout-note">
+                <span class="mono">Under review</span>
+                <p>This guide is being rechecked. Some dates or figures may be out of date, so confirm them on the official page before you act.</p>
+              </div>
+            )}
+            <Content />
+          </article>
+          <nav class="toc toc-side" aria-label="On this page">
+            <span class="mono">On this page</span>
+            <ul>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+          </nav>
+        </div>
+
+        <nav class="pn" aria-label="More guides">
+          {prev && <a class="pn-prev" href={`/guides/${prev.id}/`} rel="prev"><span class="mono">Previous guide</span><span class="pn-title">{prev.data.title}</span></a>}
+          {next && <a class="pn-next" href={`/guides/${next.id}/`} rel="next"><span class="mono">Next guide</span><span class="pn-title">{next.data.title}</span></a>}
+        </nav>
+        <div class="a-ask">
+          <p><strong>A way to find a counselor who fits is on the way.</strong>Join the waitlist to hear first.</p>
+          <a class="btn btn-primary" href="/join/">Join the waitlist</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</SystemLayout>

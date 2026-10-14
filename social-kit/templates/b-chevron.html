@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>D2Excel post B: chevron collage</title>
+<link rel="stylesheet" href="../brand.css">
+<style>
+  :root {
+    --photo-h: calc(440px + (var(--h) - 1200px) * 0.7);
+    --band-h: 184px;
+    --cut: 48px;
+  }
+  .b { background: var(--paper-50); color: var(--ink-1); }
+
+  .photo { position: absolute; left: 0; top: 0; width: 1200px; height: var(--photo-h); }
+
+  .logo-tab { position: absolute; left: 0; top: 0; width: 420px; height: 190px; background: var(--paper-50);
+    clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% 50%, calc(100% - var(--cut)) 100%, 0 100%);
+    display: flex; align-items: center; padding-left: var(--margin); }
+  .logo-tab .logo { width: 230px; }
+
+  .title-tab { position: absolute; right: 0; top: calc(var(--photo-h) - 120px); width: 640px; height: 236px; background: var(--blue-600); color: #fff;
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, var(--cut) 100%, 0 50%);
+    display: flex; align-items: center; justify-content: flex-end; padding: 0 var(--margin) 0 calc(var(--cut) + 24px); }
+  .title-tab h1 { font: 700 88px/1 var(--font-sans); letter-spacing: -0.035em; text-align: right; text-wrap: balance; max-height: 208px; width: 100%; }
+  .title-tab .accent { color: var(--blue-200); }
+
+  .copy { position: absolute; left: var(--margin); top: calc(var(--photo-h) + 52px); width: 540px; display: flex; flex-direction: column; gap: 30px; }
+  .blocks { display: flex; flex-direction: column; gap: 40px; }
+  .copy .stat { font: 650 40px/1.15 var(--font-sans); letter-spacing: -0.02em; color: var(--blue-600); text-wrap: pretty; }
+  .copy h2 { font: 680 44px/1.15 var(--font-sans); letter-spacing: -0.025em; margin-bottom: 8px; text-wrap: balance; }
+  .copy p { font: 400 30px/1.4 var(--font-sans); color: var(--ink-2); text-wrap: pretty; }
+
+  .tall .copy h2 { font-size: 48px; }
+  .tall .copy p { font-size: 33px; }
+  .inset { position: absolute; right: var(--margin); width: 436px;
+    top: calc(var(--photo-h) + 148px); bottom: calc(var(--band-h) + 40px);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 32px 100%, 0 calc(100% - 32px)); }
+
+  .cta { position: absolute; left: 0; bottom: 0; width: 640px; height: var(--band-h); background: var(--blue-600); color: #fff;
+    clip-path: polygon(0 0, calc(100% - 56px) 0, 100% 50%, calc(100% - 56px) 100%, 0 100%);
+    display: flex; flex-direction: column; justify-content: center; padding-left: var(--margin); }
+  .cta .label { font: 500 32px/1.2 var(--font-sans); color: var(--blue-100); margin-bottom: 4px; }
+  .cta .url { font: 700 50px/1.1 var(--font-sans); letter-spacing: -0.02em; }
+
+  .b .src { position: absolute; right: var(--margin); bottom: 48px; width: 436px; color: var(--ink-3); }
+  .b:has(.cta[hidden]) { --band-h: 112px; }
+  .b:has(.cta[hidden]) .src { left: var(--margin); right: auto; width: 1072px; bottom: 52px; }
+</style>
+</head>
+<body>
+<main class="slide b">
+  <div class="slot photo" data-photo="photo" data-pos="photo_position"><div class="pattern"></div></div>
+  <div class="logo-tab"><img class="logo" src="../assets/logo-tight.png" alt="D2Excel"></div>
+  <div class="title-tab"><h1 data-f="title" data-fit="56,88" data-min="56"></h1></div>
+
+  <section class="copy">
+    <p class="stat" data-f="stat"></p>
+    <div class="blocks" data-each="blocks">
+      <template>
+        <div><h2 data-f="heading"></h2><p data-f="body"></p></div>
+      </template>
+    </div>
+  </section>
+
+  <div class="slot inset" data-photo="photo2" data-pos="photo2_position"><div class="pattern pattern--light"></div></div>
+
+  <div class="cta" data-show="cta.label"><p class="label" data-f="cta.label"></p><p class="url" data-f="cta.url"></p></div>
+  <p class="src" data-f="source" data-min="24"></p>
+</main>
+<script src="../fill.js"></script>
+</body>
+</html>

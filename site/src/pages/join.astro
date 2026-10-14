@@ -1,0 +1,118 @@
+---
+// Join: the inner-page template, two columns. Left: what happens next. Right: a calm form card.
+// PLACEHOLDER FORM: it looks real but sends nothing. Wiring comes later: put the chosen service's URL in `action`, switch `method` to post,
+// add a spam honeypot, and link the real privacy policy. The fields have no `name` on purpose (only the role radios do, which need
+// one to be a group), so even a no-script submit carries no personal data: it is a GET back to this page's #sent state (a static host
+// cannot take a POST), and src/scripts/join.ts shows the same message in place. Add the names back when the form is wired.
+import InnerLayout from '../layouts/InnerLayout.astro';
+import Icon from '../components/system/Icon.astro';
+import '../styles/system/join.css';
+
+const roles = [
+  { value: 'student', label: 'Student', hint: 'Planning for college', icon: 'book', tile: 'tile-blue' },
+  { value: 'parent', label: 'Parent or family', hint: 'Supporting a student', icon: 'people', tile: 'tile-sand' },
+  { value: 'counselor', label: 'Counselor', hint: 'Advising students', icon: 'compass', tile: 'tile-ink' },
+];
+const next = [
+  'We email you when there is news',
+  'You can ask a question',
+  'Nothing is sent from this demo yet',
+];
+---
+<InnerLayout
+  title="Join the D2Excel sign-up list"
+  inner={false}
+  description="Join the D2Excel sign-up list as a student, parent or counselor. We are launching in California and will email you when there is news."
+>
+  <section class="jn theme-dark glow-field tex-dots" aria-labelledby="jn-title">
+    <div class="wrap jn-grid">
+      <div class="jn-copy">
+        <p class="mono ih-eyebrow arrive" style="--i:0">Join / Launching in California</p>
+        <h1 id="jn-title" class="jn-title arrive" style="--i:1">Say hello, and we will keep you <span class="accent">posted</span>.</h1>
+        <p class="lede arrive" style="--i:2">Tell us who you are and what you are looking for. D2Excel is launching in California, and the guides are live now.</p>
+        <ul class="jn-checks arrive" style="--i:3">
+          {next.map((t) => <li><span class="jn-check" aria-hidden="true"><Icon name="check" stroke={2.25} /></span>{t}</li>)}
+        </ul>
+        <p class="arrive" style="--i:4"><a class="link-arrow" href="/privacy/">Privacy policy (placeholder) <Icon name="arrow" /></a></p>
+      </div>
+
+      <div class="jn-card theme-light arrive" style="--i:3">
+        <p class="jn-notice"><span class="mono st st-plan">Demo</span>This form does not send anything yet.</p>
+
+        <form class="jn-form" data-join method="get" action="/join/#sent">
+          <fieldset class="fieldset jn-roles" aria-describedby="role-err">
+            <legend>I am a <span class="hint">(required)</span></legend>
+            <div class="jn-role-grid">
+              {roles.map((r) => (
+                <label class="card card-spot jn-role">
+                  <input class="sr-only" type="radio" name="role" value={r.value} required />
+                  <span class={`ic-tile ${r.tile}`}><Icon class="ico" name={r.icon} stroke={1.6} /></span>
+                  <span class="jn-role-t">{r.label}</span>
+                  <span class="hint">{r.hint}</span>
+                  <span class="jn-tick" aria-hidden="true"><Icon name="check" stroke={2.5} /></span>
+                </label>
+              ))}
+            </div>
+            <p class="error-msg" id="role-err" data-err="role" aria-live="polite"></p>
+          </fieldset>
+
+          <div class="field jn-cond jn-cond-process">
+            <label for="stage">Where are you in the process? <span class="hint">(optional)</span></label>
+            <select class="select" id="stage">
+              <option value="">Choose one</option>
+              <option>Just starting</option>
+              <option>Comparing options</option>
+              <option>Applying now</option>
+              <option>Not sure</option>
+            </select>
+          </div>
+          <div class="field jn-cond jn-cond-practice">
+            <label for="practice">Tell us about your practice <span class="hint">(optional)</span></label>
+            <textarea class="textarea" id="practice" autocomplete="off"></textarea>
+          </div>
+
+          <div class="jn-pair">
+            <div class="field">
+              <label for="name">Name <span class="hint">(optional)</span></label>
+              <input class="input" id="name" type="text" autocomplete="name" />
+            </div>
+            <div class="field">
+              <label for="email">Email <span class="hint">(required)</span></label>
+              <input class="input" id="email" type="email" autocomplete="email" required aria-describedby="email-err" />
+              <p class="error-msg" id="email-err" data-err="email" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="message">Message <span class="hint">(optional)</span></label>
+            <textarea class="textarea" id="message" autocomplete="off"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="check" for="age">
+              <input id="age" type="checkbox" required aria-describedby="age-err" />
+              <span>I am 13 or older, or I am a parent or guardian. <span class="hint">(Placeholder wording, to be confirmed.)</span></span>
+            </label>
+            <p class="error-msg" id="age-err" data-err="age" aria-live="polite"></p>
+          </div>
+
+          <p class="jn-status error-msg" role="status" data-status></p>
+          <div class="row jn-actions">
+            <button class="btn btn-primary" type="submit">Join the waitlist <Icon name="arrow" /></button>
+          </div>
+        </form>
+
+        <div class="jn-sent" id="sent" tabindex="-1" role="status">
+          <span class="jn-sent-mark" aria-hidden="true"><Icon name="check" stroke={2.25} /></span>
+          <h2 class="jn-sent-title">Thanks. This is a demo, so nothing was sent.</h2>
+          <p>When the sign-up list is live, this is where you would hear from us. For now, the guides are the best place to start.</p>
+          <div class="row">
+            <a class="btn btn-primary" href="/guides/">Browse the college guides <Icon name="arrow" /></a>
+            <a class="btn btn-glass" href="/join/" data-again>Start over</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>import '../scripts/join.ts';</script>
+</InnerLayout>

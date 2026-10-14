@@ -1,0 +1,422 @@
+---
+import fs from 'node:fs';
+import { getCollection } from 'astro:content';
+import SystemLayout from '../layouts/SystemLayout.astro';
+import GuideWall from '../components/system/GuideWall.astro';
+import Icon from '../components/system/Icon.astro';
+import '../styles/system/lab.css';
+import '../styles/system/article.css';
+import { sortGuides } from '../config';
+
+const guides = sortGuides(await getCollection('guides'));
+
+// ---- colour tokens are read from tokens.css so this page can never drift from the real values ----
+const css = fs.readFileSync(`${process.cwd()}/src/styles/system/tokens.css`, 'utf8');
+const hex: Record<string, string> = {};
+for (const m of css.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})\b/g)) hex[m[1]] = m[2].toLowerCase();
+const lum = (h: string) => {
+  const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+const ratio = (a: string, b: string) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+const blend = (fg: string, bg: string, a: number) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(fg.slice(i, i + 2), 16) * a + parseInt(bg.slice(i, i + 2), 16) * (1 - a)).toString(16).padStart(2, '0')).join('');
+const readable = (bg: string) => (ratio('#ffffff', bg) >= ratio('#050b24', bg) ? '#ffffff' : '#050b24');
+
+const groups = [
+  { title: 'Brand', note: 'The logo’s own blue and red. Blue carries actions; red is one small moment per screen.', keys: ['blue-950', 'blue-800', 'blue-700', 'blue-600', 'blue-500', 'blue-400', 'blue-300', 'blue-200', 'blue-100', 'blue-50', 'red-700', 'red-600', 'red-400', 'red-300'] },
+  { title: 'Navy ramp (dark sections)', note: 'Deep, blue-leaning, never pure black. Glow is built from the blues above it.', keys: ['navy-1000', 'navy-950', 'navy-900', 'navy-850', 'navy-800', 'navy-700'] },
+  { title: 'Paper and ink (light reading sections)', note: 'A warm paper under navy-tinted ink: the warmth separates reading from the cold, glowing dark.', keys: ['paper-0', 'paper-50', 'paper-100', 'paper-200', 'paper-300', 'paper-400', 'paper-500', 'paper-600', 'paper-900', 'ink-1', 'ink-2', 'ink-3'] },
+  { title: 'Status', note: 'Success and caution text sits only on its own tinted background.', keys: ['ok-700', 'ok-100', 'warn-800', 'warn-100'] },
+];
+const navBg = blend(hex['navy-900'], '#ffffff', 0.9); // worst case: the 90% navy nav over white paper
+const pairs = [
+  ['Dark', 'Heading and body (--text)', '#f5f8ff', hex['navy-950'], 4.5],
+  ['Dark', 'Secondary text (--text-2)', '#c3cfe8', hex['navy-950'], 4.5],
+  ['Dark', 'Muted text (--text-3)', '#93a3c7', hex['navy-950'], 4.5],
+  ['Dark', 'Muted text on a card (navy-850)', '#93a3c7', hex['navy-850'], 4.5],
+  ['Dark', 'Link and accent (blue-300)', hex['blue-300'], hex['navy-950'], 4.5],
+  ['Dark', 'Serif accent word (blue-200)', hex['blue-200'], hex['navy-950'], 4.5],
+  ['Dark', 'Red mark (red-400)', hex['red-400'], hex['navy-950'], 4.5],
+  ['Dark', 'Primary button, white on blue-500', '#ffffff', hex['blue-500'], 4.5],
+  ['Dark', 'Top nav links on worst-case backing', '#c3cfe8', navBg, 4.5],
+  ['Dark', 'Dock inactive link on navy', '#c3cfe8', blend(hex['navy-900'], hex['paper-50'], 0.92), 4.5],
+  ['Dark', 'Dock active: ink on white', hex['ink-1'], '#ffffff', 4.5],
+  ['Dark', 'Notification card mono label', '#dbe6ff', blend('#2a5fe0', '#00257a', 0.5), 4.5],
+  ['Light', 'Heading (--text, ink-1)', hex['ink-1'], hex['paper-50'], 4.5],
+  ['Light', 'Body (--text-2, ink-2)', hex['ink-2'], hex['paper-50'], 4.5],
+  ['Light', 'Muted (--text-3, ink-3)', hex['ink-3'], hex['paper-50'], 4.5],
+  ['Light', 'Muted on paper-100 (table header)', hex['ink-3'], hex['paper-100'], 4.5],
+  ['Light', 'Link and accent (blue-600)', hex['blue-600'], hex['paper-50'], 4.5],
+  ['Light', 'Red text (red-700)', hex['red-700'], hex['paper-50'], 4.5],
+  ['Light', 'Primary button, white on blue-600', '#ffffff', hex['blue-600'], 4.5],
+  ['Light', 'Quick answer label (blue-700 on blue-50)', hex['blue-700'], hex['blue-50'], 4.5],
+  ['Light', 'Caution note (#3d2a00 on warn-100)', '#3d2a00', hex['warn-100'], 4.5],
+  ['Light', 'Success text (ok-700)', hex['ok-700'], hex['paper-50'], 4.5],
+  ['Light', 'Field border (paper-500 on white), non-text', hex['paper-500'], '#ffffff', 3],
+  ['Tiles', 'Blue tile body (blue-100 on blue-600)', hex['blue-100'], hex['blue-600'], 4.5],
+  ['Tiles', 'Sky tile body (#1c3578 on blue-100)', '#1c3578', hex['blue-100'], 4.5],
+  ['Tiles', 'Sand tile body (ink-2 on paper-200)', hex['ink-2'], hex['paper-200'], 4.5],
+] as const;
+
+const typeScale = [
+  ['--t-display', 'Display', 'clamp 48 to 96 px, tracking -0.04em, line 0.98', 'display'],
+  ['--t-h1', 'Heading 1', 'clamp 40 to 80 px, tracking -0.035em, line 1.02', 'h1'],
+  ['--t-h2', 'Heading 2', 'clamp 30 to 52 px, tracking -0.03em, line 1.08', 'h2'],
+  ['--t-h3', 'Heading 3', 'clamp 22 to 28 px, tracking -0.02em, line 1.2', 'h3'],
+  ['--t-h4', 'Heading 4 / card title', '20 px, tracking -0.01em, line 1.3', 'h4'],
+] as const;
+
+const dock = [
+  { href: '#color', label: 'Color' }, { href: '#type', label: 'Type' }, { href: '#motion', label: 'Motion' },
+  { href: '#actions', label: 'Actions' }, { href: '#cards', label: 'Cards' }, { href: '#forms', label: 'Forms' }, { href: '#article', label: 'Reading' },
+];
+const toc = [
+  { id: 'a-quick', t: 'The quick answer' }, { id: 'a-deadlines', t: 'Dates and deadlines' }, { id: 'a-compare', t: 'Comparing options' }, { id: 'a-sources', t: 'Sources and where to verify' },
+];
+---
+<SystemLayout intro={false} title="Design system" description="Private design lab: tokens and components for direction C." noindex dock={dock}>
+
+  <!-- ============ OVERVIEW (dark) ============ -->
+  <section id="top" class="section theme-dark glow-field tex-dots" style="padding-top:9rem;padding-bottom:calc(var(--section-y) + var(--seam))">
+    <div class="wrap">
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--s-7);align-items:center">
+        <div class="stack-lg">
+          <p class="mono">Private lab. Not linked, not indexed, not in the sitemap.</p>
+          <h1 class="display" style="font-size:clamp(2.5rem,1.6rem + 3.6vw,4.25rem)">The D2Excel system, direction <span class="accent">C</span>.</h1>
+          <p class="lede">Dark, glowing moments for the story. Light, calm paper for anything you read or fill in. Every token and component below is shown on both.</p>
+          <div class="row">
+            <a class="btn btn-primary" href="#color">Start with color</a>
+            <a class="btn btn-glass" href="#article">Jump to the reading layout</a>
+          </div>
+          <div class="row">
+            <span class="chip chip-mono"><span class="dot"></span>California</span>
+            <span class="chip chip-mono" data-pt-time hidden></span>
+          </div>
+        </div>
+        <aside class="notify" aria-label="Notification example">
+          <p class="mono"><span>From: D2Excel</span><span>Now</span></p>
+          <strong>UC application window</strong>
+          <p>Opens Oct 1 and closes Nov 30, 2026. Read the guide before you start.</p>
+          <a href="/guides/uc-application/">Open the guide</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COLOR (light) ============ -->
+  <section id="color" class="section theme-light seam-top">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">Color</p>
+        <h2>Navy to glow, paper to ink.</h2>
+        <p class="lede">Raw values are in <code>tokens.css</code> and are read from it to build this page. Components use the semantic roles, never the raw values.</p>
+      </div>
+      <div class="stack-lg">
+        {groups.map((g) => (
+          <div>
+            <h3 style="margin-bottom:var(--s-2)">{g.title}</h3>
+            <p class="muted" style="margin-bottom:var(--s-4);max-width:60ch">{g.note}</p>
+            <div class="swatches">
+              {g.keys.map((k) => (
+                <div class="swatch" style={`background:${hex[k]};color:${readable(hex[k])}`}><b>--{k}</b><span>{hex[k]}</span></div>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div>
+          <h3 style="margin-bottom:var(--s-2)">Measured text contrast</h3>
+          <p class="muted" style="margin-bottom:var(--s-4);max-width:60ch">Computed from the token values at build time (WCAG relative luminance). Text needs 4.5, large text and UI boundaries 3. Red and the brand blue are used for text only in the combinations listed.</p>
+          <div class="table-wrap">
+            <table class="ratio-table">
+              <thead><tr><th>Theme</th><th>Pair</th><th>Sample</th><th>Ratio</th><th>Needs</th><th>Result</th></tr></thead>
+              <tbody>
+                {pairs.map(([theme, label, fg, bg, need]) => {
+                  const r = ratio(fg, bg);
+                  return (
+                    <tr>
+                      <td>{theme}</td><td>{label}</td>
+                      <td>{need === 3 ? <span class="sample" aria-hidden="true" style={`background:${bg};box-shadow:inset 0 0 0 2px ${fg}`}>&nbsp;</span> : <span class="sample" style={`background:${bg};color:${fg}`}>Aa</span>}</td>
+                      <td style="font-variant-numeric:tabular-nums">{r.toFixed(2)}:1</td><td>{need}:1</td>
+                      <td class={r >= need ? 'pass' : ''} style={r >= need ? '' : 'color:var(--err);font-weight:700'}>{r >= need ? 'Pass' : 'Fail'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TYPE (dark) ============ -->
+  <section id="type" class="section theme-dark seam-top">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">Type</p>
+        <h2>A grotesque, one <span class="accent">italic</span> voice, and a mono for data.</h2>
+        <p class="lede">Geist for headlines and text, Instrument Serif italic for one accent word per headline, Geist Mono for dates, sources and tags. All open-licensed (OFL) and self-hosted.</p>
+      </div>
+      <div class="panels">
+        {['theme-dark', 'theme-light'].map((t) => (
+          <div class={`panel ${t}`}>
+            <span class="mono">On {t === 'theme-dark' ? 'dark' : 'light'}</span>
+            <h3 class="h1" style="font-size:clamp(2rem,1.4rem + 2vw,3.25rem)">Find the <span class="accent">right counselor</span> next.</h3>
+            <p style="font-size:var(--t-lede)">Plain-language, sourced guides for California students. <a href="#type">A link inside text.</a></p>
+            <p class="muted">Body copy at 16 px with a 1.55 line height keeps long paragraphs steady across a phone and a desktop, and the secondary tone stays above 4.5:1 on its own background.</p>
+            <p class="mono">Last verified Sept 2026 · Source: sample</p>
+          </div>
+        ))}
+      </div>
+      <div style="margin-top:var(--s-7)">
+        {typeScale.map(([tok, name, spec, cls]) => (
+          <div class="spec">
+            <span class="mono">{tok}<br />{name}</span>
+            <div>
+              {cls === 'display' ? <p class="display">Clear answers</p> : cls === 'h1' ? <p class="h1">Clear answers first</p> : cls === 'h2' ? <p class="h2">Clear answers first, then a counselor</p> : cls === 'h3' ? <p class="h3">Clear answers first, then a counselor who fits</p> : <p style="font-size:var(--t-h4);font-weight:600">Clear answers first, then a counselor who fits</p>}
+              <p class="mono" style="margin-top:var(--s-3)">{spec}</p>
+            </div>
+          </div>
+        ))}
+        <div class="spec"><span class="mono">--t-lede</span><p style="font-size:var(--t-lede);line-height:1.5">Lede: 18 to 22 px, used once under a headline.</p></div>
+        <div class="spec"><span class="mono">--t-read</span><p style="font-size:var(--t-read);line-height:1.7;max-width:var(--measure)">Reading text: 17 to 19 px at a 1.7 line height, capped at 66 characters per line for long articles.</p></div>
+        <div class="spec"><span class="mono">--t-base / --t-sm</span><p>Body 16 px. <span style="font-size:var(--t-sm)">Small 14 px for hints and table text.</span></p></div>
+        <div class="spec"><span class="mono">--t-micro</span><p class="mono">Mono label: 12 px, +0.08em, uppercase</p></div>
+        <div class="spec"><span class="mono">.accent</span><p class="h2">One <span class="accent">italic</span> word, never a whole line.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPACE, SHAPE, ELEVATION, MOTION (light) ============ -->
+  <section id="motion" class="section theme-light seam-top">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">Space, shape, depth and motion</p>
+        <h2>One rhythm, one language of movement.</h2>
+        <p class="lede">Things arrive with an exponential ease-out and settle. Nothing loops. Scroll and cursor drive the big moments; everything else finishes within a second.</p>
+      </div>
+
+      <div class="panels">
+        <div class="panel theme-light">
+          <span class="mono">Spacing, 4 px base</span>
+          {[['--s-1', '4'], ['--s-2', '8'], ['--s-3', '12'], ['--s-4', '16'], ['--s-5', '24'], ['--s-6', '32'], ['--s-7', '48'], ['--s-8', '64'], ['--s-9', '96']].map(([t, px]) => (
+            <div class="demo-line" style="grid-template-columns:6rem 1fr"><span class="mono">{t} · {px}</span><i class="space-bar" style={`width:${px}px`}></i></div>
+          ))}
+        </div>
+        <div class="panel theme-light">
+          <span class="mono">Radii</span>
+          <div class="row" style="gap:var(--s-5);align-items:flex-end">
+            {[['--r-xs', '6'], ['--r-sm', '10'], ['--r-md', '14'], ['--r-lg', '20'], ['--r-xl', '28'], ['--r-pill', '999']].map(([t, px]) => (
+              <div class="stack" style="text-align:center"><div class="radius-box" style={`border-radius:${px}px`}></div><span class="mono">{t.replace('--r-', '')}<br />{px === '999' ? 'full' : px + 'px'}</span></div>
+            ))}
+          </div>
+          <span class="mono" style="margin-top:var(--s-3)">Seam: clamp 24 to 56 px</span>
+        </div>
+      </div>
+
+      <div class="panels" style="margin-top:var(--s-5)">
+        {['theme-dark', 'theme-light'].map((t) => (
+          <div class={`panel ${t}`}>
+            <span class="mono">Elevation on {t === 'theme-dark' ? 'dark' : 'light'}</span>
+            <div class="elev-box" style="box-shadow:var(--shadow-1)"><span class="mono">--shadow-1 · resting card</span></div>
+            <div class="elev-box" style="box-shadow:var(--shadow-2)"><span class="mono">--shadow-2 · hover, raised</span></div>
+          </div>
+        ))}
+      </div>
+
+      <div class="panels" style="margin-top:var(--s-5)">
+        {['theme-dark', 'theme-light'].map((t) => (
+          <div class={`panel ${t} motion-demo`} data-motion-demo>
+            <span class="mono">Motion tokens · hover, focus, or press Replay</span>
+            <div class="stack">
+              {[['--dur-instant', '100ms', 'var(--dur-instant)'], ['--dur-fast', '180ms', 'var(--dur-fast)'], ['--dur-base', '320ms', 'var(--dur-base)'], ['--dur-slow', '560ms', 'var(--dur-slow)'], ['--dur-scene', '900ms', 'var(--dur-scene)']].map(([n, ms, v]) => (
+                <div class="demo-line"><span class="mono">{n}<br />{ms}</span><div class="track" style={`--run:calc(100% - 2.6rem)`}><i style={`transition-duration:${v};transition-timing-function:var(--ease-out)`}></i></div></div>
+              ))}
+            </div>
+            <div class="stack">
+              {[['--ease-out', 'arrivals'], ['--ease-std', 'hover, press'], ['--ease-in-out', 'page, seams']].map(([n, u]) => (
+                <div class="demo-line"><span class="mono">{n}<br />{u}</span><div class="track" style={`--run:calc(100% - 2.6rem)`}><i style={`transition-duration:var(--dur-scene);transition-timing-function:var(${n})`}></i></div></div>
+              ))}
+            </div>
+            <button class="btn btn-glass btn-sm" type="button" data-replay>Replay</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ACTIONS: buttons, chips, links (dark) ============ -->
+  <section id="actions" class="section theme-dark seam-top">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">Buttons, chips and links</p>
+        <h2>Three kinds of action, all at least 44 px tall.</h2>
+      </div>
+      <div class="panels">
+        {['theme-dark', 'theme-light'].map((t) => (
+          <div class={`panel ${t}`}>
+            <span class="mono">On {t === 'theme-dark' ? 'dark' : 'light'}</span>
+            <div class="row">
+              <a class="btn btn-primary" href="#actions">Primary <Icon name="arrow" /></a>
+              <a class="btn btn-glass" href="#actions">Glassy</a>
+              <a class="link-arrow" href="#actions">Text link <Icon name="arrow" /></a>
+            </div>
+            <div class="row">
+              <a class="btn btn-primary btn-sm" href="#actions">Small primary</a>
+              <a class="btn btn-glass btn-sm" href="#actions">Small glassy</a>
+              <button class="btn btn-primary" type="button" disabled>Disabled</button>
+            </div>
+            <div class="row">
+              <span class="chip">Topic</span>
+              <span class="chip chip-mono"><span class="dot"></span>New</span>
+              <a class="chip" href="/guides/uc-application/">When is the UC deadline?</a>
+              <button class="chip" type="button" aria-pressed="true" data-toggle>Filter on</button>
+              <button class="chip" type="button" aria-pressed="false" data-toggle>Filter off</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CARDS (light) ============ -->
+  <section id="cards" class="section theme-light seam-top">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">Cards and the set piece</p>
+        <h2>Spotlight, tilt, and flat tiles.</h2>
+        <p class="lede">Move the cursor over the cards. Spotlight follows the pointer; tilt leans a few degrees toward it. Both are off for touch and for reduced motion.</p>
+      </div>
+      <div class="panels">
+        {['theme-dark', 'theme-light'].map((t) => (
+          <div class={`panel ${t} tilt-area`}>
+            <span class="mono">On {t === 'theme-dark' ? 'dark' : 'light'}</span>
+            <a class="card card-spot card-tilt" href="/guides/uc-application/">
+              <span class="mono">{guides[0].data.category}</span>
+              <h3>{guides[0].data.title}</h3>
+              <p>{guides[0].data.description}</p>
+              <span class="card-foot"><span class="chip chip-mono verified-chip">Last verified · sample</span><span class="go">Read the guide <Icon name="arrow" /></span></span>
+            </a>
+            <div class="card card-spot"><h3>Spotlight card</h3><p>A plain container. The glow follows the cursor and stays behind the text.</p></div>
+          </div>
+        ))}
+      </div>
+      <div class="grid g3" style="margin-top:var(--s-5)">
+        <a class="tile tile-blue" href="#cards"><Icon class="glyph" name="calendar" stroke={1.5} /><div><h3>Deadlines</h3><p>Flat illustrated tile, blue.</p></div></a>
+        <a class="tile tile-sky" href="#cards"><Icon class="glyph" name="coin" stroke={1.5} /><div><h3>Paying for college</h3><p>Flat illustrated tile, sky.</p></div></a>
+        <a class="tile tile-sand" href="#cards"><Icon class="glyph" name="compass" stroke={1.5} /><div><h3>Choosing a major</h3><p>Flat illustrated tile, sand.</p></div></a>
+        <a class="tile tile-ink" href="#cards"><Icon class="glyph" name="people" stroke={1.5} /><div><h3>Counselors</h3><p>Flat illustrated tile, ink.</p></div></a>
+        <a class="tile tile-sky" href="#cards"><Icon class="glyph" name="book" stroke={1.5} /><div><h3>Essays</h3><p>The icon set is drawn once, one stroke weight.</p></div></a>
+      </div>
+
+      <h3 style="margin-top:var(--s-8);margin-bottom:var(--s-4)">The set piece: tilted guide wall in a glowing oval</h3>
+      <p class="muted" style="margin-bottom:var(--s-5);max-width:62ch">Real guide cards (the six links) mixed with decorative tiles, tilted in CSS 3D inside a ring that echoes the logo’s oval. Cursor moves the viewpoint, scroll drifts alternate columns, nothing runs on its own. Measured in <code>QA-LOG.md</code>.</p>
+      <div class="stage theme-dark glow-field tex-dots" data-v="a" style="border-radius:var(--r-xl);padding:var(--s-6) var(--s-5)">
+        <div style="max-width:44rem;margin-inline:auto"><GuideWall guides={guides} /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FORMS (dark) ============ -->
+  <section id="forms" class="section theme-dark seam-top">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">Form fields</p>
+        <h2>Labels always visible, errors in words.</h2>
+        <p class="lede">Demo forms only: nothing is sent. Submit the empty form to see the error state.</p>
+      </div>
+      <div class="panels">
+        {['theme-dark', 'theme-light'].map((t, k) => (
+          <form class={`panel ${t}`} data-demo-form novalidate>
+            <span class="mono">On {t === 'theme-dark' ? 'dark' : 'light'}</span>
+            <div class="field">
+              <label for={`n${k}`}>Your name</label>
+              <input class="input" id={`n${k}`} name="name" autocomplete="name" required />
+              <p class="error-msg" data-err="name" hidden>Add your name so we know what to call you.</p>
+            </div>
+            <div class="field">
+              <label for={`e${k}`}>Email</label>
+              <input class="input" id={`e${k}`} name="email" type="email" autocomplete="email" required aria-describedby={`eh${k}`} />
+              <p class="hint" id={`eh${k}`}>We only use this to tell you when the marketplace opens.</p>
+              <p class="error-msg" data-err="email" hidden>Add an email address, like name@example.com.</p>
+            </div>
+            <div class="field">
+              <label for={`r${k}`}>I am a</label>
+              <select class="select" id={`r${k}`} name="role"><option>Student</option><option>Parent</option><option>Counselor</option></select>
+            </div>
+            <div class="field">
+              <label for={`m${k}`}>What would help most? <span class="hint">(optional)</span></label>
+              <textarea class="textarea" id={`m${k}`} name="message"></textarea>
+            </div>
+            <label class="check"><input type="checkbox" name="consent" /><span>I am 13 or older, or a parent or guardian is signing up with me.</span></label>
+            <div class="row"><button class="btn btn-primary" type="submit">Join the waitlist</button></div>
+            <p class="form-status" data-form-status role="status" hidden></p>
+          </form>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARTICLE READING LAYOUT (the real template is src/pages/guides/[slug].astro) ============ -->
+  <div id="article" class="article-page theme-light seam-top">
+    <header class="ah">
+      <div class="a-col">
+        <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/guides/">Guides</a></li></ol></nav>
+        <p class="mono ah-kicker">Applications</p>
+        <h2 class="ah-title">A light head, then reading on paper.</h2>
+        <ul class="ah-meta">
+          <li class="verified"><span class="mono">Last verified Sep 2026 (sample)</span></li>
+          <li><span class="mono">4 min read</span></li>
+          <li><span class="tag tag-review">Under review</span></li>
+          <li><span class="tag tag-dates">Key dates inside</span></li>
+        </ul>
+      </div>
+    </header>
+    <div class="a-body">
+      <div class="a-col article-layout">
+        <article class="prose">
+          <div class="callout callout-note"><span class="mono">Placeholder</span><p>Sample text for layout only. Real guides replace everything below, with their own sources and verified date.</p></div>
+          <p class="p-lead">The opening paragraph of a guide is set a little larger than the body.</p>
+          <div class="callout callout-answer" id="a-quick"><p class="callout-label">Quick answer</p><p>A short, direct answer goes first, in a sentence or two, before any detail.</p></div>
+          <p>Body copy is set at 17 to 19 px with a 1.7 line height and a column of about 70 characters, which is the width the eye tracks comfortably. Headings are tight and short, and every section starts with the answer, then the detail.</p>
+          <h2 id="a-deadlines">Dates and deadlines</h2>
+          <p>Lists mark each item with a small blue dot instead of a heavy bullet. <strong>Strong text</strong> is a weight change, not a colour change, and <a href="#a-sources">links are underlined</a> so they never depend on colour alone.</p>
+          <ul><li>First sample item, short and complete.</li><li>Second sample item that is long enough to wrap onto a second line at the reading measure and show the hanging indent.</li><li>Third sample item.</li></ul>
+          <h2 id="a-compare">Comparing options</h2>
+          <p>Tables sit in a frame; under 40rem each row becomes its own small card.</p>
+          <div class="table-wrap table-dates">
+            <table>
+              <thead><tr><th>Date</th><th>What happens</th></tr></thead>
+              <tbody>
+                <tr><td data-label="Date">Sample date one</td><td data-label="What happens">To be added</td></tr>
+                <tr><td data-label="Date">Sample date two</td><td data-label="What happens">To be added</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <section class="sources">
+            <h2 id="a-sources">Sources and where to verify</h2>
+            <ul><li>Each finished guide lists the official pages it relies on.</li></ul>
+            <p class="verified-line">Last verified: September 2026 (sample).</p>
+          </section>
+        </article>
+        <nav class="toc toc-side" aria-label="On this page">
+          <span class="mono">On this page</span>
+          <ul>{toc.map((i) => <li><a href={`#${i.id}`}>{i.t}</a></li>)}</ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</SystemLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-motion-demo]').forEach((el) =>
+    el.querySelector('[data-replay]')?.addEventListener('click', () => {
+      el.classList.remove('go');
+      void el.offsetWidth;
+      requestAnimationFrame(() => el.classList.add('go'));
+    }),
+  );
+  document.querySelectorAll<HTMLButtonElement>('button[data-toggle]').forEach((b) =>
+    b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))),
+  );
+</script>

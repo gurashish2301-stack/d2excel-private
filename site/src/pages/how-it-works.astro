@@ -1,0 +1,116 @@
+---
+import InnerLayout from '../layouts/InnerLayout.astro';
+import InnerHero from '../components/system/InnerHero.astro';
+import InnerSection from '../components/system/InnerSection.astro';
+import InnerAsk from '../components/system/InnerAsk.astro';
+import Icon from '../components/system/Icon.astro';
+
+// Four steps, written for two sides. `live` follows what exists today: the guides are published and the waitlist is open;
+// finding and working with a counselor is not built yet, so those two are Planned.
+const steps = [
+  { t: 'Explore', live: true, s: 'Read the guides and get clear on how the process works.', c: 'Tell us about your practice on the sign-up form.' },
+  { t: 'Join', live: true, s: 'Join the sign-up list and tell us where you are in the process.', c: 'Join the counselor sign-up list. We will follow up as launch gets closer.' },
+  { t: 'Meet', live: false, s: 'Browse counselor profiles.', c: 'Have a profile that students and parents can browse.' },
+  { t: 'Work together', live: false, s: 'Connect with a counselor and work through the next steps.', c: 'Work with the students who contact you.' },
+];
+const roles = [
+  { id: 'students', label: 'Students', key: 's' },
+  { id: 'counselors', label: 'Counselors', key: 'c' },
+];
+const groups = [
+  { live: true, head: 'Live today', note: 'The guides are published and the sign-up list is open', items: steps.map((st, i) => ({ ...st, n: i + 1 })).filter((st) => st.live) },
+  { live: false, head: 'Planned', note: 'None of this is built yet', items: steps.map((st, i) => ({ ...st, n: i + 1 })).filter((st) => !st.live) },
+];
+// The two circles' overlap, as one closed path: centres (260,215) and (380,215), radius 150.
+const LENS = 'M320 77.5A150 150 0 0 1 320 352.5A150 150 0 0 1 320 77.5Z';
+---
+<InnerLayout
+  title="How D2Excel works for students and counselors"
+  description="How D2Excel is designed to work in California: explore the guides, join the sign-up list, then meet and work with a counselor. Two steps are live."
+>
+  <InnerHero
+    eyebrow={['How it works', 'Launching in California']}
+    title={{ lead: 'From first question to the', accent: 'right fit', punct: '.', tail: '' }}
+    lede="Here is how D2Excel is designed to work, for students and for counselors. We are still building it, so treat this as the plan."
+    primary={{ href: '/guides/', label: 'Read the guides' }}
+    secondary={{ href: '/join/', label: 'Join the waitlist' }}
+    note="Planned means not built yet."
+  >
+    <Fragment slot="art">
+      <ol class="route">
+        {steps.map((st, i) => (
+          <li class="arrive" style={`--i:${4 + i}`}>
+            <div class:list={['card', !st.live && 'plan-card']}>
+              <span class:list={['ic-tile', st.live ? 'tile-blue' : 'tile-ink']}>{i + 1}</span>
+              <span class:list={['mono st', st.live ? 'st-live' : 'st-plan']}>{st.live ? 'Live today' : 'Planned'}</span>
+              <span class="card-title">{st.t}</span>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </Fragment>
+  </InnerHero>
+
+  <InnerSection id="steps" seam rails lede="Two steps work today: the guides and the sign-up list. The other two are still being built. An independent college counselor is a private adviser, not a school employee.">
+    <Fragment slot="title">How D2Excel works, in four steps.</Fragment>
+    <div class="hiw" data-hiw>
+      <div class="hiw-main">
+        <!-- Shown only when scripts run and motion is allowed; otherwise both lists below are readable one after the other. -->
+        <div class="hiw-switch" role="tablist" aria-label="Show the steps for" data-active="students">
+          {roles.map((r, i) => (
+            <button type="button" role="tab" id={`tab-${r.id}`} aria-controls={`panel-${r.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{r.label}</button>
+          ))}
+        </div>
+        <div class="hiw-panels">
+          {roles.map((r) => (
+            <div class="hiw-panel" role="tabpanel" id={`panel-${r.id}`} aria-labelledby={`tab-${r.id}`}>
+              <p class="mono hiw-role">For {r.label.toLowerCase()}</p>
+              {groups.map((g) => (
+                <section class:list={['hiw-group', g.live ? 'is-live' : 'is-plan']} aria-label={g.head}>
+                  <p class="hiw-head"><span class:list={['mono st', g.live ? 'st-live' : 'st-plan']}>{g.head}</span><span class="mono">{g.note}</span></p>
+                  <ol class="hiw-steps" start={g.items[0].n}>
+                    {g.items.map((st) => (
+                      <li>
+                        <span class="hiw-n" aria-hidden="true">{st.n}</span>
+                        <h3>{st.t}</h3>
+                        <p>{st[r.key]}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              ))}
+              <a class="link-arrow" href={`/for-${r.id}/`}>{r.id === 'students' ? 'What students get from D2Excel' : 'What counselors can expect'} <Icon name="arrow" /></a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <figure class="hiw-fit rise">
+        <div class="fit" aria-hidden="true">
+          <svg viewBox="0 0 640 400" focusable="false">
+            <defs>
+              <mask id="fit-reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="400">
+                <path class="fit-draw" pathLength="1" d={LENS} fill="none" stroke="#fff" stroke-width="10" stroke-linejoin="round" />
+              </mask>
+            </defs>
+            <circle class="fit-c" cx="260" cy="215" r="150" />
+            <circle class="fit-c" cx="380" cy="215" r="150" />
+            <path class="fit-fill" d={LENS} />
+            <path class="fit-lens" d={LENS} mask="url(#fit-reveal)" />
+          </svg>
+          <span class="fit-name fit-a">Students</span>
+          <span class="fit-name fit-b">Counselors</span>
+          <span class="mono fit-n fit-na">1 · 2</span>
+          <span class="mono fit-n fit-nb">1 · 2</span>
+          <span class="fit-mid"><strong>Fit</strong><span class="mono">3 · 4</span></span>
+        </div>
+        <figcaption>Steps 1 and 2 happen on each side. Steps 3 and 4 happen in the fit, which is still being built.</figcaption>
+      </figure>
+    </div>
+  </InnerSection>
+
+  <InnerAsk lede="Students, parents and counselors can all sign up. Tell us where you are and we will keep you posted." cta={{ href: '/join/', label: 'Join the waitlist' }}>
+    <Fragment slot="title">Get on the <span class="accent">sign-up list</span>.</Fragment>
+    California first, then across the US. We are starting where we can do the work well, then planning to expand.
+  </InnerAsk>
+</InnerLayout>

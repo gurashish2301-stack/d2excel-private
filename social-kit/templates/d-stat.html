@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>D2Excel post D: big stat card</title>
+<link rel="stylesheet" href="../brand.css">
+<style>
+  .d { background: var(--glow), var(--bg); color: var(--text); padding: 64px var(--margin) 52px; display: flex; flex-direction: column; }
+  .rings { position: absolute; right: -330px; top: 50%; width: 1000px; height: 750px; transform: translateY(-50%); pointer-events: none; }
+
+  .top { position: relative; display: flex; justify-content: space-between; align-items: center; }
+  [data-theme="light"] .d .plate { background: transparent; }
+  .d .plate { width: 196px; }
+  .d .plate .logo { width: 150px; }
+  .kicker { font: 600 26px/1.2 var(--font-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--kicker); text-align: right; max-width: 620px; }
+
+  .mid { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .num { font: 650 400px/0.9 var(--font-sans); letter-spacing: -0.065em; color: var(--num); white-space: nowrap; }
+  .bar { width: 120px; height: 12px; background: var(--red-600); margin: 40px 0; }
+  .sentence { font: 500 50px/1.22 var(--font-sans); letter-spacing: -0.02em; color: var(--text); max-width: 1010px; max-height: 6.2em; text-wrap: balance; }
+  .subline { font: 400 36px/1.3 var(--font-sans); letter-spacing: -0.01em; color: var(--text-2); margin-top: 20px; max-width: 1010px; text-wrap: pretty; }
+  .d .src { position: relative; color: var(--text-3); max-width: 1072px; }
+</style>
+</head>
+<body data-theme="dark">
+<main class="slide d">
+  <svg class="rings" viewBox="-500 -375 1000 750" aria-hidden="true">
+    <g fill="none" stroke="var(--ring)" stroke-width="2">
+      <ellipse rx="140" ry="105" stroke-opacity="0.9"/><ellipse rx="230" ry="172" stroke-opacity="0.7"/>
+      <ellipse rx="320" ry="240" stroke-opacity="0.5"/><ellipse rx="410" ry="307" stroke-opacity="0.33"/>
+      <ellipse rx="500" ry="375" stroke-opacity="0.2"/>
+    </g>
+  </svg>
+
+  <header class="top">
+    <div class="plate"><img class="logo" src="../assets/logo-tight.png" alt="D2Excel"></div>
+    <p class="kicker" data-f="kicker" data-min="24"></p>
+  </header>
+
+  <section class="mid">
+    <p class="num" data-f="number" data-fit="140,400" data-min="140"></p>
+    <div class="bar" aria-hidden="true"></div>
+    <p class="sentence" data-f="sentence" data-fit="36,50" data-min="36"></p>
+    <p class="subline" data-f="subline"></p>
+  </section>
+
+  <p class="src" data-f="source" data-min="24"></p>
+</main>
+<script src="../fill.js"></script>
+</body>
+</html>

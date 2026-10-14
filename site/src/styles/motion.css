@@ -1,0 +1,43 @@
+/* ---------- motion: CSS layer ----------
+   Shared language: --ease (UI), --ease-out (arrivals), --ease-in-out (page and curtain moves).
+   GSAP code mirrors these as power3.out / expo.out / expo.inOut. */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes counter { to { transform: rotate(-360deg) scaleY(calc(1 / var(--k))); } }
+@keyframes drift-a { to { transform: translate3d(-6vw, 5vw, 0) scale(1.12); } }
+@keyframes drift-b { to { transform: translate3d(8vw, -4vw, 0) scale(1.15); } }
+@keyframes grid-drift { to { transform: translate3d(0, 64px, 0); } }
+@keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.7; } 50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } }
+@keyframes rise { from { transform: translate3d(0, 28px, 0); } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes reveal-up { from { opacity: 0; transform: translate3d(0, 24px, 0); } }
+@keyframes scroll-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes vt-out { to { opacity: 0.55; transform: scale(0.965) translate3d(0, -2%, 0); filter: brightness(0.7); } }
+@keyframes vt-in { from { clip-path: inset(100% 0 0 0 round 2.5rem 2.5rem 0 0); } to { clip-path: inset(0 0 0 0 round 0); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* inner pages: pure-CSS intro */
+  .page-hero h1 { animation: rise 0.9s var(--ease) both; }
+  .page-hero .lede, .page-hero .crumbs { animation: fade 1s 0.15s var(--ease) both; }
+  .page-hero .orbit-wrap { animation: fade 1.6s var(--ease) both; }
+
+  /* cross-document View Transitions: the header stays put, the new page wipes up over the old one */
+  @view-transition { navigation: auto; }
+  .site-header { view-transition-name: site-header; }
+  ::view-transition-group(root) { animation-duration: 0.8s; }
+  ::view-transition-old(root) { animation: vt-out 0.8s var(--ease-in-out) both; }
+  ::view-transition-new(root) { animation: vt-in 0.8s var(--ease-in-out) both; }
+
+  /* scroll-driven: progress line and card reveals. Progressive enhancement; content is visible without them */
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .progress { animation: scroll-progress linear both; }
+    .progress[aria-hidden] { animation-timeline: scroll(); } /* separate selector so the minifier keeps it out of the shorthand, which some engines reject */
+    .reveal { animation: reveal-up linear both; animation-timeline: view(); animation-range: entry 4% entry 38%; }
+    .reveal[style*='--d'] { animation-range: entry calc(4% + var(--d) * 5%) entry calc(38% + var(--d) * 5%); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* every animation has a static fallback: final state, no movement, no pause control needed */
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .motion-toggle, .curtain, .progress { display: none; }
+}

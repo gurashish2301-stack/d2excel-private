@@ -1,0 +1,22 @@
+---
+// One idea per row. Copy (status eyebrow, heading, short paragraphs in the default slot, one text link) and a small diagram or
+// real guide cards in the `art` slot. In a `.frows` wrapper rows alternate sides by position; in a `.bento` wrapper they are tiles
+// (`wide` makes the tile span the full width, copy and art side by side).
+// status: 'live' (Live today) or 'plan' (Planned). Never mark something live that is not. 'none' shows the tile glyph only (About's principles).
+// The art slot is optional.
+import Icon from './Icon.astro';
+const { status = 'live', icon = 'book', tile = 'tile-blue', title, link, wide = false } = Astro.props;
+const hasArt = Astro.slots.has('art');
+---
+<article class:list={['frow', wide && 'is-wide']} data-status={status}>
+  <div class="frow-copy rise">
+    <p class="frow-eyebrow">
+      <span class={`ic-tile ${tile}`}><Icon class="ico" name={icon} stroke={1.6} /></span>
+      {status !== 'none' && <span class:list={['mono st', status === 'live' ? 'st-live' : 'st-plan']}>{status === 'live' ? 'Live today' : 'Planned'}</span>}
+    </p>
+    <h3>{title}</h3>
+    <div class="frow-text stack"><slot /></div>
+    {link && <a class="link-arrow" href={link.href}>{link.label} <Icon name="arrow" /></a>}
+  </div>
+  {hasArt && <div class="frow-art rise"><slot name="art" /></div>}
+</article>

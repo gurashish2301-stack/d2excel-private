@@ -1,0 +1,355 @@
+/* ---------- home page ---------- */
+
+@keyframes oval-draw { from { stroke-dashoffset: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .notify.arrive { animation: ds-notify var(--dur-slow) var(--ease-out) 1s both; }
+  /* drawn once, after the headline words have landed; the path is not inside an .arrive block, so it waits for the logo curtain here */
+  .oval path { animation: oval-draw 1.5s var(--ease-in-out) 0.9s both; }
+  html.intro:not(.intro-open) .oval path { animation-play-state: paused; }
+}
+
+/* ---------- hero ---------- */
+.hero { padding-block: 0; }
+.hero .hero-grid { padding-block: clamp(7rem, 12vw, 9rem) calc(clamp(4rem, 8vw, 7rem) + var(--seam)); }
+.hero-copy { position: relative; }
+.hero-eyebrow { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); margin-bottom: var(--s-5); }
+.hero-eyebrow .mono { color: var(--text-2); }
+.hero-eyebrow .pt { color: var(--accent); }
+.hero-title { font-size: clamp(2.5rem, 1.5rem + 3vw, 3.75rem); line-height: 1.16; }
+.hero-title .w { display: inline-block; }
+.accent-wrap { display: inline-block; padding-inline: 0.12em; white-space: nowrap; }
+/* the big tilted ring behind the headline block: the SVG box is 150% by 160% of the head (eyebrow, headline, lede) and tilted like the
+   logo's oval, so it frames the words and runs out under the ring art. It has no stacking context between it and .stage, so z-index -1
+   puts it under every word (text is always on top); the stroke is thin and half transparent, so the text over it keeps its contrast. */
+.hero-head { position: relative; }
+.oval { position: absolute; z-index: -1; left: 50%; top: 50%; width: 150%; height: 160%; max-width: none; translate: -50% -50%; rotate: -11deg; overflow: visible; pointer-events: none; }
+/* single column (the head is then wider than its text): centre on the text and size to it, so the ring still frames the words */
+@media (max-width: 69.99rem) { .oval { left: calc(min(100%, 38rem) / 2); width: calc(min(100%, 38rem) * 1.16); height: 230%; } }
+.oval path { fill: none; stroke-width: 1.8px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; filter: drop-shadow(0 0 6px rgb(91 140 255 / 0.45)); }
+/* the logo's two colours: the red of the "2" where the line starts, the blue of the ring where it meets the ring art */
+.oval .s-red { stop-color: var(--red-400); stop-opacity: 0.7; }
+.oval .s-mix { stop-color: var(--red-300); stop-opacity: 0.42; }
+.oval .s-blue { stop-color: var(--blue-400); stop-opacity: 0.6; }
+.oval .s-blue2 { stop-color: var(--blue-300); stop-opacity: 0.55; }
+.hero-eyebrow .mono:first-child::before { content: ''; display: inline-block; width: 0.5rem; height: 0.5rem; margin-right: 0.65rem; border-radius: 50%; background: var(--red-mark); box-shadow: 0 0 10px var(--red-glow); vertical-align: 0.05em; }
+.hero .lede { margin-top: var(--s-5); }
+.hero .row { margin-top: var(--s-6); }
+.quick { margin-top: var(--s-7); }
+.quick .mono { margin-bottom: var(--s-3); color: var(--text-2); }
+.quick ul { gap: var(--s-2); }
+.quick .chip { white-space: normal; text-align: left; }
+
+.hero-stage { position: relative; }
+.hero-stage .hero-art { margin-right: -6%; }
+.wall .card .topic { display: none; }
+/* the notification sits under the ring, not over it: the cards orbit the whole ring, so no part of it is covered */
+.hero-stage .notify { position: relative; z-index: 3; margin: 0.25rem 0 0 4%; width: min(24rem, 92%); }
+.hero-stage .notify strong a { color: #fff; text-decoration: none; }
+.hero-stage .notify strong a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+.hero-stage .notify strong a:focus-visible { outline: none; box-shadow: none; }
+.hero-stage .notify strong a:focus-visible::after { outline: 3px solid #fff; outline-offset: 3px; }
+.hero-stage .wall-plane { inset: 7% 9% 9% 9%; --wall-x: 34deg; --wall-z: -9deg; --wall-scale: 1; }
+@media (max-width: 69.99rem) { .hero-stage .wall-plane { inset: 9% 11% 14% 11%; --wall-scale: 1; } }
+@media (max-width: 46rem) { .hero-stage .wall-plane { inset: 8% 8% 13% 8%; --wall-x: 28deg; --wall-z: -6deg; --wall-scale: 0.95; } }
+.hero-stage .wall .card { padding: var(--s-3); gap: var(--s-2); min-height: 0; }
+.hero-stage .wall .card .card-title { font-size: 1rem; line-height: 1.2; }
+@media (min-width: 70rem) { .hero .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); } }
+@media (max-width: 69.99rem) { .hero .hero-grid { grid-template-columns: minmax(0, 1fr); min-height: 0; } .hero-title { max-width: 16em; } }
+@media (max-width: 69.99rem) {
+  .hero-stage { max-width: 40rem; justify-self: center; width: 100%; }
+  .hero-stage .hero-art { margin-right: 0; }
+  .hero-stage { padding-bottom: 0; }
+  .hero-stage .notify { position: relative; left: auto; bottom: auto; margin: 0.5rem auto 0; width: min(26rem, 100%); }
+}
+.wall .card .lv { display: block; margin-top: var(--s-1); color: var(--text-2); font-size: var(--t-micro); }
+
+/* ---------- the signature: the six guide cards make a quarter turn round the ring as you scroll the first screen ----------
+   One registered number, --p (0 to 1), is driven by a scroll timeline on .hero-stage and everything else is arithmetic on it.
+   Each card leaves its slot, rides the ellipse a quarter turn (90 degrees, clockwise, 10% farther out than the wall sits; nearer
+   cards in front, far cards smaller) and fades as it goes; at the end of the range all six are gone (visibility hidden, so they are neither clickable nor
+   focusable) and the lit ring is left clear. At --p 0 every translate is exactly zero, so the wall at rest is the wall as built.
+   Without scroll timelines, with reduced motion or without CSS trig, --p stays 0: nothing moves and every card is readable.
+   Written as longhands on purpose: the build's minifier folds `animation` + `animation-timeline` into one shorthand that
+   Chromium 145 drops (see QA-LOG, Round 4).
+   Library: the idea of cards orbiting a centre is Magic UI's Orbiting Circles (MIT). Rebuilt here as scroll-driven CSS with no package
+   (0 kB), no loop and a static fallback. */
+@property --p { syntax: '<number>'; inherits: true; initial-value: 0; }
+@keyframes orbit { to { --p: 1; } }
+@keyframes gone { to { visibility: hidden; } }
+.hero-stage .hero-art { container-type: inline-size; }
+.hero-stage .wall-col { animation: none; }
+/* the fade mask clips to the wall's box, and the cards now travel past it */
+.hero.stage[data-v] .hero-stage .wall { -webkit-mask-image: none; mask-image: none; }
+.hero-stage { --rx: 39.6cqw; --ry: 33cqw; --lift: 6px; --shrink: 0.22; --depth: 0.02; --out: 0.1; }
+/* NB: the wall plane's first child is a decorative <i>, so columns are counted with :nth-of-type (:nth-child(1) matches nothing, which
+   left the third column without an angle: two of the six cards never moved in the first version of this block).
+   slot angle (--a, degrees, clockwise from 3 o'clock) and slot centre (--sx, --sy, in cqw from the plane centre) for each of the six cards;
+   the six angles are 60 degrees apart, in the order the cards sit around the wall */
+.wall-col:nth-of-type(1) .wall-item:nth-child(1) { --a: 210; --sx: -28; --sy: -12; }
+.wall-col:nth-of-type(2) .wall-item:nth-child(1) { --a: 270; --sx: 0; --sy: -13; }
+.wall-col:nth-of-type(3) .wall-item:nth-child(1) { --a: 330; --sx: 28; --sy: -16; }
+.wall-col:nth-of-type(3) .wall-item:nth-child(2) { --a: 30; --sx: 28; --sy: 10; }
+.wall-col:nth-of-type(2) .wall-item:nth-child(2) { --a: 90; --sx: 0; --sy: 12; }
+.wall-col:nth-of-type(1) .wall-item:nth-child(2) { --a: 150; --sx: -28; --sy: 12; }
+
+/* at rest the six cards sit 10% farther from the centre of the ring than the grid puts them (also the static view: reduced motion, no scroll timelines) */
+.hero-stage .wall-item { translate: calc(var(--sx) * var(--out) * 1cqw) calc(var(--sy) * var(--out) * 1cqw); }
+
+/* phones: all six cards, two columns by three rows (the long titles need the width), in a tall ring that grows with them */
+@media (max-width: 46rem) {
+  .hero-stage { --rx: 33cqw; --ry: 70.4cqw; --lift: 24px; --shrink: 0.3; --depth: 0.05; }
+  .hero-stage .wall-col, .hero-stage .wall-col:nth-of-type(3) { display: contents; }
+  .hero-stage .hero-art { aspect-ratio: auto; padding-block: 15cqw; }
+  .hero-stage .wall, .hero-stage .wall-plane { position: relative; inset: auto; }
+  .hero-stage .wall-plane { --wall-x: 18deg; --wall-z: -4deg; --wall-scale: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-inline: 9%; }
+  .hero-stage .ring, .hero-stage .ring-halo { inset: 0; }
+  .wall-col:nth-of-type(1) .wall-item:nth-child(1) { --a: 270; --sx: -22; --sy: -46; }
+  .wall-col:nth-of-type(1) .wall-item:nth-child(2) { --a: 330; --sx: 22; --sy: -46; }
+  .wall-col:nth-of-type(2) .wall-item:nth-child(1) { --a: 210; --sx: -22; --sy: 0; }
+  .wall-col:nth-of-type(2) .wall-item:nth-child(2) { --a: 30; --sx: 22; --sy: 0; }
+  .wall-col:nth-of-type(3) .wall-item:nth-child(1) { --a: 150; --sx: -22; --sy: 46; }
+  .wall-col:nth-of-type(3) .wall-item:nth-child(2) { --a: 90; --sx: 22; --sy: 46; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: scroll()) and (translate: 0 0) and (width: calc(sin(1deg) * 1px))) {
+    @media (min-width: 70rem) {
+      /* the art is on screen at load: the page scroll drives the turn over the first 45% of a screen. The art holds its place
+         (sticky) while the copy scrolls away, so the whole turn is seen; the copy column has extra room below for that (a sticky
+         item only travels inside its own grid row). On short screens it just scrolls with the page. */
+      .hero-stage { animation-name: orbit; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 0px 45vh; }
+      @media (min-height: 48rem) {
+        .hero-copy { padding-bottom: 38svh; }
+        .hero-stage { position: sticky; top: 5.5rem; align-self: start; }
+      }
+    }
+    @media (max-width: 69.99rem) {
+      /* the art sits under the copy: drive by the art's own passage through the screen */
+      .hero-stage { view-timeline: --art block; animation-name: orbit; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --art; animation-range: entry 55% cover 52%; }
+    }
+    .hero-stage .wall-item {
+      --q: var(--p);
+      --th: calc(var(--a) * 1deg + 90deg * var(--q));
+      --s: sin(clamp(0, var(--q) * 5, 1) * 90deg);
+      --fade: clamp(0, (var(--q) - 0.25) / 0.65, 1);
+      translate:
+        calc(var(--sx) * var(--out) * 1cqw + var(--s) * (cos(var(--th)) * var(--rx) - var(--sx) * (1 + var(--out)) * 1cqw))
+        calc(var(--sy) * var(--out) * 1cqw + var(--s) * (sin(var(--th)) * var(--ry) - var(--sy) * (1 + var(--out)) * 1cqw))
+        calc(var(--s) * sin(var(--th)) * var(--lift));
+      scale: calc(1 - var(--s) * var(--shrink) + var(--s) * sin(var(--th)) * var(--depth) - var(--fade) * 0.15);
+    }
+    .hero-stage .wall .card {
+      opacity: calc(1 - var(--fade, 0));
+      animation-name: gone; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 0px 45vh;
+    }
+    @media (max-width: 69.99rem) {
+      .hero-stage .wall .card { animation-timeline: --art; animation-range: entry 55% cover 52%; }
+    }
+    .hero-stage .ring { --turn: calc(200deg + 90deg * var(--p)); }
+    .hero-stage .ring-ember { left: 50%; top: 50%; translate: calc(-50% + cos(calc(136deg + 90deg * var(--p))) * 50cqw) calc(-50% + sin(calc(136deg + 90deg * var(--p))) * 37.5cqw); }
+  }
+}
+
+/* ---------- red, with intent ----------
+   The logo's red (tokens.css) is a marker, never a button or a link: the arc on the ring and its ember, the dot before "Now", the
+   dock's active dot, the underline on a hovered question, the "Planned" markers, the seam line, and the closing ask where it leads.
+   Blue stays the action colour. Red text is --accent-red (red-400 on navy, red-700 on paper); everything else is a stroke or a dot. */
+.hero-stage .ring { background: conic-gradient(from var(--turn, 200deg), var(--blue-500) 0%, var(--blue-200) 16%, var(--blue-400) 33%, var(--red-400) 49%, var(--red-500) 57%, var(--blue-400) 68%, var(--blue-500) 80%, var(--blue-200) 100%); }
+.hero-stage .notify .now { display: inline-flex; align-items: center; gap: 0.45rem; padding: 1px 10px 1px 8px; border-radius: var(--r-pill); background: #fff; color: var(--ink-1); }
+.hero-stage .notify .now::before { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--red-600); }
+.quick a.chip:hover, .quick a.chip:focus-visible { text-decoration: underline; text-decoration-color: var(--red-mark); text-decoration-thickness: 2px; text-underline-offset: 0.28em; }
+.nav-dock a { position: relative; }
+.nav-dock a[aria-current='true']::before { content: ''; position: absolute; left: 0.3rem; top: 50%; width: 0.35rem; height: 0.35rem; margin-top: -0.175rem; border-radius: 50%; background: var(--red-600); }
+.sc-ink .sc-live::before, .sc-panel-soon > .mono::before { background: var(--red-400); }
+.sc-panel-soon > .mono::before { content: ''; display: inline-block; width: 0.5rem; height: 0.5rem; margin-right: 0.5rem; border-radius: 50%; vertical-align: 0.05em; }
+
+/* the seam between the first screen and the guides: a hairline from the logo's red to its blue, drawn left to right as the seam rises
+   through the screen (a view timeline on the section; without it, the finished line).
+   Library: the idea of a coloured beam travelling a path is Magic UI's Animated Beam and Border Beam (MIT); here it is drawn once by
+   scroll, never looped, with no package (0 kB). */
+#guides::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; z-index: 1; height: calc(var(--seam) + 4px); padding-top: 3px; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(90deg, var(--red-500), var(--blue-400) 58%, var(--blue-300));
+  -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+@keyframes seam-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    #guides { view-timeline: --guides block; }
+    #guides::before { animation-name: seam-draw; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --guides; animation-range: entry 0% entry 26%; }
+  }
+}
+
+/* the three doors lie on an arc and settle flat as they enter: the outer two start lower and turned a few degrees, the middle one a
+   little higher. They sit 16px apart, so the offsets are too small to overlap, and every door is flat and in place at rest. */
+@keyframes door-l { from { opacity: 0; translate: 3% 2.25rem; rotate: -3deg; } }
+@keyframes door-m { from { opacity: 0; translate: 0 1rem; } }
+@keyframes door-r { from { opacity: 0; translate: -3% 2.25rem; rotate: 3deg; } }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .role { animation-name: door-m; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: entry 5% entry 80%; }
+    @media (min-width: 56.0625rem) {
+      .role-student { animation-name: door-l; }
+      .role-counselor { animation-name: door-r; }
+    }
+  }
+}
+
+/* ---------- section helpers ---------- */
+.section-head .mono { color: var(--text-3); }
+.section-head h2 .accent { font-size: 1.1em; }
+.more { margin-top: var(--s-6); }
+.small { font-size: var(--t-sm); line-height: 1.5; color: var(--text-2); }
+
+/* ---------- guides ---------- */
+.guide-grid { display: grid; gap: var(--s-4); grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.guide-tile { grid-column: span 3; min-height: 15rem; align-content: space-between; }
+.guide-lead { grid-column: span 6; min-height: 22rem; }
+.guide-lead h3 { font-size: clamp(1.625rem, 1.3rem + 1.1vw, 2.25rem); }
+.dates { display: grid; gap: var(--s-3); margin: var(--s-4) 0 0; }
+.dates > div { display: grid; gap: 2px; }
+.dates dd { margin: 0; font-size: 1.125rem; font-weight: 600; color: inherit; letter-spacing: -0.01em; }
+.tile-blue .dates dd, .tile-ink .dates dd { color: #fff; }
+.tile-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-2) var(--s-4); }
+@media (max-width: 62rem) { .guide-tile { grid-column: span 6; } .guide-lead { grid-column: span 12; min-height: 18rem; } }
+@media (max-width: 40rem) { .guide-tile { grid-column: span 12; min-height: 12rem; } }
+
+/* ---------- role router ---------- */
+.paths { background: var(--paper-100); }
+.role-grid { display: grid; gap: var(--s-4); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.role { min-height: 21rem; }
+.role p:not(.mono) { font-size: 1rem; line-height: 1.5; margin-top: var(--s-3); }
+.role-parent { border-radius: var(--r-xl) var(--r-xl) 6rem var(--r-xl); }
+.role-counselor { border-radius: var(--r-xl) 6rem var(--r-xl) var(--r-xl); }
+@media (max-width: 56rem) { .role-grid { grid-template-columns: minmax(0, 1fr); } .role { min-height: 15rem; } }
+
+/* ---------- story: a stack of step cards, one revealed per scroll beat ---------- */
+.story { padding-bottom: calc(var(--section-y) + var(--seam)); overflow-x: clip; }
+.story .section-head .mono { color: var(--text-3); }
+.steps { display: grid; gap: var(--s-4); position: relative; z-index: 3; }
+.step-card {
+  position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-6) var(--s-7); align-items: center;
+  min-height: 26rem; padding: clamp(1.5rem, 3vw, 3rem); border-radius: var(--r-xl); overflow: clip;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.18) inset, 0 30px 70px -30px rgb(0 0 0 / 0.8);
+}
+.step-card h3 { font-size: clamp(1.75rem, 1.3rem + 1.5vw, 2.75rem); line-height: 1.05; letter-spacing: -0.03em; }
+.step-card p { max-width: 34ch; }
+.sc-blue { background: var(--blue-600); color: #fff; }
+.sc-blue h3 { color: #fff; } .sc-blue p { color: var(--blue-100); } .sc-blue .mono { color: var(--blue-100); }
+.sc-sky { background: var(--blue-100); color: var(--blue-950); }
+.sc-sky h3 { color: var(--blue-950); } .sc-sky p { color: #1c3578; } .sc-sky .mono { color: #1c3578; }
+.sc-sand { background: var(--paper-200); color: var(--ink-1); }
+.sc-sand h3 { color: var(--ink-1); } .sc-sand p { color: var(--ink-2); } .sc-sand .mono { color: var(--ink-2); }
+.sc-ink { background: var(--navy-850); color: #fff; border: 1px solid var(--navy-line-strong); }
+.sc-ink h3 { color: #fff; } .sc-ink p { color: #c3cfe8; } .sc-ink .mono { color: #c3cfe8; }
+.sc-copy .mono:first-child { font-size: 0.875rem; }
+.sc-live { display: inline-flex; align-items: center; gap: var(--s-2); }
+.sc-live::before { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: currentColor; }
+
+/* the real, dated panel in each card */
+.sc-panel { display: grid; gap: var(--s-4); align-content: center; padding: var(--s-5); border-radius: var(--r-lg); background: var(--paper-0); color: var(--ink-1); box-shadow: var(--shadow-1); }
+.sc-panel .mono { color: var(--ink-3); }
+.sc-panel p, .sc-panel a { max-width: none; }
+.mini-cards { display: grid; gap: var(--s-3); }
+.mini { display: grid; gap: 2px; padding: var(--s-3) var(--s-4); border-radius: var(--r-md); border: 1px solid var(--border); background: var(--paper-50); color: var(--ink-1); text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease-std), transform var(--dur-base) var(--ease-std); }
+.mini:hover { border-color: var(--blue-600); transform: translateX(3px); }
+.mini-title { font-weight: 600; font-size: 1.0625rem; letter-spacing: -0.01em; }
+.date-list { display: grid; margin: 0; }
+.date-list > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-1) var(--s-4); padding-block: var(--s-3); border-bottom: 1px solid var(--border); }
+.date-list > div:first-child { padding-top: 0; }
+.date-list dt { color: var(--ink-2); }
+.date-list dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mini-table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+.mini-table th, .mini-table td { padding: var(--s-3) var(--s-4); text-align: left; border-bottom: 1px solid var(--border); color: var(--ink-1); }
+.mini-table thead th { font: 500 var(--t-micro)/1.4 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--ink-3); background: var(--paper-100); }
+.mini-table tbody th { font-weight: 600; }
+.mini-table tr:last-child > * { border-bottom: 0; }
+.sc-panel .table-wrap { border: 1px solid var(--border); border-radius: var(--r-md); background: var(--paper-0); }
+.sc-panel p { color: var(--ink-2); }
+.sc-panel a:not(.btn) { color: var(--blue-600); }
+.sc-panel-soon { background: transparent; border: 1.5px dashed var(--navy-line-strong); box-shadow: none; justify-items: start; }
+.sc-panel-soon .mono { color: #c3cfe8; }
+.sc-panel-soon strong { font-size: 1.25rem; letter-spacing: -0.015em; color: #fff; }
+.sc-panel-soon p { color: #c3cfe8; }
+.sc-panel-soon .btn { color: #fff; }
+
+/* the fifth beat: a light card that continues straight into the next section */
+.sc-end { background: var(--paper-50); color: var(--ink-1); grid-template-columns: minmax(0, 1fr); justify-items: start; align-content: center; gap: var(--s-4); }
+.sc-end h3 { color: var(--ink-1); max-width: 16ch; font-size: clamp(2rem, 1.4rem + 2.2vw, 3.5rem); }
+.sc-end h3 .accent { color: var(--blue-600); }
+.sc-end p { color: var(--ink-2); max-width: 44ch; }
+.sc-end .link-arrow { color: var(--blue-600); }
+.end-ring { position: absolute; right: -9%; top: 50%; width: 52%; aspect-ratio: 1.33; translate: 0 -50%; border-radius: 50%; border: 2px solid var(--blue-600); opacity: 0.35; pointer-events: none;
+  box-shadow: inset 0 0 0 14px var(--paper-50), inset 0 0 0 15px rgb(0 64 192 / 0.35), 0 0 0 14px var(--paper-50), 0 0 0 15px rgb(0 64 192 / 0.2); }
+@media (max-width: 52rem) { .end-ring { display: none; } }
+
+@media (max-width: 52rem) { .step-card { grid-template-columns: minmax(0, 1fr); min-height: 0; } }
+
+/* the pin: wide and tall screens only, and only when motion is allowed. Everywhere else the cards simply stack in order. */
+@media (min-width: 52.0625rem) and (min-height: 40rem) and (prefers-reduced-motion: no-preference) {
+  .steps { gap: 0; }
+  .step { position: sticky; top: calc(5.75rem + var(--n) * 0.5rem); margin-bottom: clamp(2.5rem, calc(100svh - 35rem), 30rem); }
+  .step-end { margin-bottom: 0; }
+  /* the fifth card needs room after it to stay pinned; the next section rises over that room, so it overlaps */
+  .steps::after { content: ''; display: block; height: var(--hold); }
+  .story { --hold: clamp(14rem, 34vh, 22rem); padding-bottom: 0; }
+  .facts { margin-top: calc(var(--seam) * -1 - 6rem); }
+
+  /* each card is eased back as the next one arrives (progressive: without scroll timelines the stack is just sticky) */
+  @supports ((animation-timeline: view()) and (animation-range: entry 0% cover 50%)) {
+    .steps { timeline-scope: --a2, --a3, --a4, --a5; }
+    .step:nth-child(2) { view-timeline: --a2 block; }
+    .step:nth-child(3) { view-timeline: --a3 block; }
+    .step:nth-child(4) { view-timeline: --a4 block; }
+    .step:nth-child(5) { view-timeline: --a5 block; }
+    #facts { view-timeline: --a6 block; }
+    main { timeline-scope: --a6; }
+    /* longhands on purpose (see the orbit): the minifier would fold `animation` and `animation-timeline` into one shorthand that Chromium 145 drops */
+    .step-card { transform-origin: 50% 0; animation-name: step-back; animation-timing-function: linear; animation-fill-mode: both; animation-range: entry 0% entry 100%; }
+    .step:nth-child(1) .step-card { animation-timeline: --a2; }
+    .step:nth-child(2) .step-card { animation-timeline: --a3; }
+    .step:nth-child(3) .step-card { animation-timeline: --a4; }
+    .step:nth-child(4) .step-card { animation-timeline: --a5; }
+    .step-end .step-card { animation-timeline: --a6; }
+    /* supporting motion: each card is dealt in along a shallow arc (from alternate sides, turned 2 degrees) as it arrives, then lies flat.
+       Individual translate and rotate properties, so they never touch the transform the step-back uses; nothing moves at rest. */
+    .step { --dir: 1; animation-name: deal; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: entry 0% entry 75%; }
+    .step:nth-child(even) { --dir: -1; }
+  }
+}
+@keyframes deal { from { translate: calc(var(--dir) * 4%) 2.5rem; rotate: calc(var(--dir) * 2deg); } }
+@keyframes step-back { to { transform: scale(0.95); filter: brightness(0.8); } }
+
+/* ---------- how we check facts ---------- */
+.facts { background: var(--paper-50); }
+.anatomy { display: grid; gap: var(--s-8); grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; }
+.anat-page { display: grid; gap: var(--s-3); padding: var(--s-5); border-radius: var(--r-xl); background: var(--paper-0); border: 1px solid var(--border); box-shadow: var(--shadow-2); margin: 0; }
+.anat-title { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.02em; color: var(--ink-1); line-height: 1.2; margin-bottom: var(--s-2); }
+.anat-block { position: relative; display: grid; gap: var(--s-2); padding: var(--s-4); border-radius: var(--r-md); border: 1px dashed var(--paper-500); background: var(--paper-50); }
+.anat-block p { color: var(--ink-1); font-size: 0.9375rem; line-height: 1.45; }
+.anat-answer { background: var(--blue-50); border-color: var(--blue-600); }
+.anat-tag { justify-self: start; padding: 2px 10px; border-radius: var(--r-pill); background: var(--ink-1); color: #fff !important; }
+.anat-lv p { font-weight: 500; color: var(--ink-1); }
+.anat-list { display: grid; gap: var(--s-5); counter-reset: none; }
+.anat-list li { display: grid; gap: var(--s-1); padding-bottom: var(--s-5); border-bottom: 1px solid var(--border-strong); }
+.anat-list li:last-child { border-bottom: 0; }
+.anat-list h3 { font-size: var(--t-h4); letter-spacing: -0.015em; }
+.anat-list p { color: var(--ink-2); max-width: 52ch; }
+@media (max-width: 52rem) { .anatomy { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); } }
+
+/* ---------- the one ask ---------- */
+.ask { padding-bottom: calc(var(--section-y) + var(--seam)); }
+/* the one section where red leads: a red glow rising from the lower left, the accent word and the "Planned" markers in the logo's red */
+.section.ask { background: radial-gradient(58% 85% at 8% 100%, rgb(224 16 32 / 0.3), transparent 72%), radial-gradient(42% 55% at 94% 0%, rgb(0 64 192 / 0.38), transparent 72%), var(--navy-950); }
+.ask h2 .accent { color: var(--red-300); }
+.ask .stack-lg > .mono::before { content: ''; display: inline-block; width: 0.5rem; height: 0.5rem; margin-right: 0.65rem; border-radius: 50%; background: var(--red-mark); box-shadow: 0 0 10px var(--red-glow); vertical-align: 0.05em; }
+.ask-grid { display: grid; gap: var(--s-8); grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: center; }
+.ask h2 { font-size: var(--t-h1); }
+.ask .mono { color: var(--text-2); }
+.ask-note { margin-bottom: var(--s-3); }
+.later { display: grid; gap: var(--s-3); }
+.later-item { display: grid; gap: var(--s-2); justify-items: start; padding: var(--s-4) var(--s-5); border-radius: var(--r-lg); border: 1.5px dashed var(--red-line); background: var(--red-tint); }
+.later-item .chip-mono { color: var(--red-300); border-color: var(--red-line); background: transparent; }
+.later-item h3 { font-size: var(--t-h4); }
+.later-item p { color: var(--text-2); font-size: 0.9375rem; }
+@media (max-width: 52rem) { .ask-grid { grid-template-columns: minmax(0, 1fr); } }

@@ -1,0 +1,82 @@
+/* D2Excel social kit: shared brand tokens and parts. Values are copied from site/src/styles/system/tokens.css.
+   All layouts are designed on a 1200 px wide canvas. The 4:5 size is 1200 x 1500 scaled by 0.9 at export. */
+
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: block; }
+@font-face { font-family: 'Geist Mono'; src: url('assets/fonts/geist-mono-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: block; }
+@font-face { font-family: 'Instrument Serif'; src: url('assets/fonts/instrument-serif-latin-400-italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: block; }
+
+:root {
+  --blue-950: #00123d; --blue-800: #00257a; --blue-700: #0033a0; --blue-600: #0040c0; --blue-500: #2a5fe0;
+  --blue-400: #5b8cff; --blue-300: #8fb2ff; --blue-200: #c4d6ff; --blue-100: #e3ecff; --blue-50: #f1f5ff;
+  --red-700: #b00d1a; --red-600: #e01020; --red-400: #ff5a66;
+  --navy-950: #050b24; --navy-900: #08122e; --navy-850: #0b1a40; --navy-800: #0f2255;
+  --paper-0: #ffffff; --paper-50: #fbfaf6; --paper-200: #ebe7db;
+  --ink-1: #0b1430; --ink-2: #2b3450; --ink-3: #4f5a75;
+  --font-sans: 'Geist', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --h: 1200px;            /* canvas height, set by render.mjs (1200 or 1500) */
+  --margin: 64px;
+}
+
+/* Theme roles (dark = navy, light = paper), same roles as the site. */
+[data-theme="dark"] {
+  --bg: linear-gradient(165deg, var(--navy-950) 0%, var(--navy-850) 58%, var(--blue-800) 135%);
+  --glow: radial-gradient(ellipse 60% 42% at 14% 62%, rgb(42 95 224 / 0.38), transparent 72%);
+  --text: #f5f8ff; --text-2: #c3cfe8; --text-3: #93a3c7;
+  --accent-word: var(--blue-200); --kicker: var(--blue-300);
+  --line: rgb(143 178 255 / 0.8); --ring: rgb(150 180 255 / 0.34);
+  --plate: var(--paper-50); --plate-ring: rgb(196 214 255 / 0.6);
+  --num: #ffffff;
+}
+[data-theme="light"] {
+  --bg: linear-gradient(170deg, var(--paper-50) 0%, var(--blue-50) 100%);
+  --glow: radial-gradient(ellipse 55% 40% at 14% 62%, rgb(196 214 255 / 0.55), transparent 72%);
+  --text: var(--ink-1); --text-2: var(--ink-2); --text-3: var(--ink-3);
+  --accent-word: var(--blue-600); --kicker: var(--blue-600);
+  --line: rgb(0 64 192 / 0.5); --ring: rgb(0 64 192 / 0.2);
+  --plate: var(--paper-0); --plate-ring: rgb(0 64 192 / 0.35);
+  --num: var(--blue-600);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+html { width: 1200px; background: #fff; }
+body {
+  width: 1200px; height: var(--h); overflow: hidden;
+  font-family: var(--font-sans); font-kerning: normal; text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+.slide { position: relative; width: 1200px; height: var(--h); overflow: hidden; }
+ol, ul { list-style: none; }
+
+/* one serif-italic accent word per headline */
+.nb { white-space: nowrap; }
+.accent { font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 1.1em; letter-spacing: -0.01em; line-height: 0; }
+
+/* source and label lines: mono, 24 px floor */
+.src { font: 400 24px/1.4 var(--font-mono); letter-spacing: 0; text-wrap: pretty; }
+
+/* the logo sits on an oval plate (the logo's own aspect) when the background is dark */
+.logo { display: block; height: auto; }
+.plate { display: grid; place-items: center; background: var(--plate); border-radius: 50%; aspect-ratio: 4 / 3; }
+
+/* photo slot. With no photo, a designed pattern of nested ovals (the logo's shape) fills it. */
+.slot { position: relative; overflow: hidden; }
+.slot > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slot > .pattern { position: absolute; inset: 0; }
+.slot[data-has-photo] > .pattern { display: none; }
+.pattern {
+  background-color: var(--blue-700);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Cg stroke-opacity='.09'%3E%3Cellipse cx='820' cy='430' rx='120' ry='90'/%3E%3Cellipse cx='820' cy='430' rx='240' ry='180'/%3E%3Cellipse cx='820' cy='430' rx='360' ry='270'/%3E%3Cellipse cx='820' cy='430' rx='480' ry='360'/%3E%3Cellipse cx='820' cy='430' rx='600' ry='450'/%3E%3Cellipse cx='820' cy='430' rx='720' ry='540'/%3E%3C/g%3E%3Cg stroke-opacity='.18' stroke-width='3'%3E%3Cellipse cx='820' cy='430' rx='60' ry='45'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, var(--blue-800), var(--blue-600) 70%, var(--blue-500));
+  background-size: cover, cover;
+  background-position: center, center;
+}
+.pattern--light {
+  background-color: var(--blue-100);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%230040c0' stroke-width='2'%3E%3Cg stroke-opacity='.16'%3E%3Cellipse cx='760' cy='400' rx='120' ry='90'/%3E%3Cellipse cx='760' cy='400' rx='240' ry='180'/%3E%3Cellipse cx='760' cy='400' rx='360' ry='270'/%3E%3Cellipse cx='760' cy='400' rx='480' ry='360'/%3E%3Cellipse cx='760' cy='400' rx='600' ry='450'/%3E%3Cellipse cx='760' cy='400' rx='720' ry='540'/%3E%3C/g%3E%3Cg stroke-opacity='.32' stroke-width='3'%3E%3Cellipse cx='760' cy='400' rx='60' ry='45'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, var(--blue-100), var(--blue-200));
+}

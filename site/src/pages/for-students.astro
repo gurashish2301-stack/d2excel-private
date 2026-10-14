@@ -1,0 +1,125 @@
+---
+import { getCollection } from 'astro:content';
+import InnerLayout from '../layouts/InnerLayout.astro';
+import InnerHero from '../components/system/InnerHero.astro';
+import InnerSection from '../components/system/InnerSection.astro';
+import FeatureRow from '../components/system/FeatureRow.astro';
+import InnerAsk from '../components/system/InnerAsk.astro';
+import Icon from '../components/system/Icon.astro';
+import { categoryLook, fmtMonth, sortGuides } from '../config';
+
+const guides = sortGuides(await getCollection('guides'));
+const byId = Object.fromEntries(guides.map((g) => [g.id, g]));
+const lv = (g) => fmtMonth(g.data.lastVerified);
+const look = (g) => categoryLook(g.data.category);
+const uc = byId['uc-application'], money = byId['college-money'], pick = byId['ai-and-your-application'], counselor = byId['choose-a-counselor'];
+const picks = [uc, money, pick];
+const count = guides.length;
+
+const dock = [
+  { href: '#get', label: 'What you get' },
+  { href: '#join', label: 'Join' },
+];
+---
+<InnerLayout
+  title="College guides for California students"
+  description="Guides on applying, testing and paying for college in California, free to read today. A way to find an independent counselor is planned."
+  dock={dock}
+>
+  <InnerHero
+    eyebrow={['For students', 'Launching in California']}
+    title={{ lead: 'College answers you can check,', accent: 'today', punct: '.', tail: '' }}
+    lede="Guides on applying, testing and paying for college in California, free to read today. Finding a counselor is planned."
+    primary={{ href: '/guides/', label: `Browse all ${count} college guides` }}
+    secondary={{ href: '/join/?role=student', label: 'Join the student waitlist' }}
+    note="Planned means not built yet."
+  >
+    <Fragment slot="art">
+      <ol class="path">
+        {[uc, money].map((g, i) => (
+          <li class="arrive" style={`--i:${4 + i}`}>
+            <a class="card card-spot" href={`/guides/${g.id}/`} tabindex="-1">
+              <span class={`ic-tile ${look(g).tile}`}><Icon class="ico" name={look(g).icon} stroke={1.6} /></span>
+              <span class="mono">{g.data.category}</span>
+              <span class="card-title">{g.data.title}</span>
+            </a>
+          </li>
+        ))}
+        <li class="arrive" style="--i:6">
+          <div class="card plan-card">
+            <span class="ic-tile tile-ink"><Icon class="ico" name="people" stroke={1.6} /></span>
+            <span class="mono st st-plan">Planned</span>
+            <span class="card-title">Find a counselor</span>
+          </div>
+        </li>
+      </ol>
+    </Fragment>
+  </InnerHero>
+
+  <InnerSection id="get" seam rails lede="D2Excel is early-stage. The guides are live today. Everything else here is planned.">
+    <Fragment slot="title">Guides to read now, and help that is planned.</Fragment>
+    <div class="bento">
+      <FeatureRow status="live" icon="book" tile="tile-blue" title="Guides you can check" link={{ href: '/guides/', label: `Browse all ${count} college guides` }}>
+        <p>Each guide is written in plain language and points to the official sources, so you know where to confirm a detail before you act on it.</p>
+        <p>Also read <a href="/guides/sat-or-act/">the SAT and ACT guide</a> or <a href="/guides/major-worth/">the guide to choosing a major</a>.</p>
+        <Fragment slot="art">
+          <ul class="gstack">
+            {picks.map((g) => (
+              <li>
+                <a class="card card-spot" href={`/guides/${g.id}/`}>
+                  <span class={`ic-tile ${look(g).tile}`}><Icon class="ico" name={look(g).icon} stroke={1.6} /></span>
+                  <span class="mono">{g.data.category}</span>
+                  <span class="card-title">{g.data.title}</span>
+                  <span class="mono">Last verified {lv(g)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Fragment>
+      </FeatureRow>
+
+      <FeatureRow status="live" icon="compass" tile="tile-sky" title="Built around California" link={{ href: '/guides/uc-application/', label: 'Read how the UC application works' }}>
+        <p>Our UC (University of California) guide shows how the UC application differs from the Common App (the shared college application).</p>
+        <Fragment slot="art">
+          <figure class="cmp">
+            <table>
+              <caption class="sr-only">How the UC application differs from most other colleges</caption>
+              <thead><tr><th scope="col"><span class="sr-only">Topic</span></th><th scope="col">Most other colleges</th><th scope="col">UC schools</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Where you apply</th><td data-label="Most other colleges">The Common App, plus extra questions for each school</td><td data-label="UC schools">UC’s own website. One form.</td></tr>
+                <tr><th scope="row">Essays</th><td data-label="Most other colleges">One long essay (650 words), plus extra ones per school</td><td data-label="UC schools">4 short answers, picked from 8 questions</td></tr>
+                <tr><th scope="row">Letters of recommendation</th><td data-label="Most other colleges">Usually 1 to 3 required</td><td data-label="UC schools">Not required</td></tr>
+              </tbody>
+            </table>
+            <figcaption>Adapted from the UC application guide. Last verified {lv(uc)}.</figcaption>
+          </figure>
+        </Fragment>
+      </FeatureRow>
+
+      <FeatureRow wide status="plan" icon="people" tile="tile-sand" title="Help from a counselor" link={{ href: '/guides/choose-a-counselor/', label: 'Read how to choose a college counselor' }}>
+        <p>An independent college counselor is a private adviser, not a school employee. The plan is for you to browse independent counselor profiles. Student accounts and a deadline planner are planned too.</p>
+        <Fragment slot="art">
+          <div class="after">
+            <a class="card card-spot" href="/guides/choose-a-counselor/">
+              <span class={`ic-tile ${look(counselor).tile}`}><Icon class="ico" name={look(counselor).icon} stroke={1.6} /></span>
+              <span class="mono">Live today</span>
+              <span class="card-title">{counselor.data.title}</span>
+              <span class="mono">Last verified {lv(counselor)}</span>
+            </a>
+            <i class="join" aria-hidden="true"></i>
+            <div class="plan-note">
+              <span class="mono st st-plan">Planned</span>
+              <strong>Find a counselor</strong>
+              <p>Not available yet.</p>
+            </div>
+          </div>
+        </Fragment>
+      </FeatureRow>
+    </div>
+  </InnerSection>
+
+  <InnerAsk lede="Tell us where you are in the process and we will keep you posted." cta={{ href: '/join/?role=student', label: 'Join the student waitlist' }}>
+    <Fragment slot="title">Get on the student <span class="accent">sign-up list</span>.</Fragment>
+    D2Excel is early-stage, and we will not promise admission outcomes. No guide or counselor can. See <a href="/how-it-works/">how D2Excel is designed to work</a>, or read <a href="/for-counselors/">what it means for counselors</a>.
+  </InnerAsk>
+</InnerLayout>

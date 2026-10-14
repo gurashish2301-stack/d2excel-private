@@ -1,0 +1,100 @@
+---
+import '@fontsource-variable/bricolage-grotesque/wght.css';
+import '@fontsource-variable/instrument-sans/wght.css';
+import '../styles/global.css';
+import brico from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
+import instrument from '@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { NOINDEX, SITE_NAME, SITE_URL } from '../config';
+
+const { title, description, jsonLd = [], ogType = 'website' } = Astro.props;
+const fullTitle = title === SITE_NAME ? `${SITE_NAME} | Start with clear answers. Find the right counselor next.` : `${title} | ${SITE_NAME}`;
+const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+const image = new URL('/og.png', SITE_URL).href;
+const org = { '@context': 'https://schema.org', '@type': 'Organization', name: SITE_NAME, url: SITE_URL };
+const graphs = [org, ...jsonLd];
+// The logo's oval ring as one closed path (centre 163,123.5; radii 159.5 x 120), starting at the top, clockwise.
+const RING = 'M163 3.5A159.5 120 0 1 1 163 243.5A159.5 120 0 1 1 163 3.5Z';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {NOINDEX && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#0040c0" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="D2Excel logo and the headline "Find the counselor who fits where you're headed" on a blue background" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preload" href={brico} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={instrument} as="font" type="font/woff2" crossorigin />
+
+    <!-- Runs before first paint. "motion" gates the start states of animated pieces, and "intro" shows the logo
+         reveal on the first visit of a session. Both are skipped for reduced motion. If the animation script has not
+         taken over after 3 seconds, both gates are removed so nothing stays hidden or covered. -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('motion');
+          try {
+            if (!sessionStorage.getItem('d2e-intro')) {
+              sessionStorage.setItem('d2e-intro', '1');
+              d.classList.add('intro');
+              window.__intro0 = performance.now();
+              // Skip before the animation script is ready: just drop the curtain.
+              var early = function () { if (!window.__introGo) { d.classList.remove('intro'); dispatchEvent(new Event('d2e:intro-reveal')); } };
+              addEventListener('pointerdown', early, { once: true });
+              addEventListener('keydown', early, { once: true });
+            }
+          } catch (e) {}
+          setTimeout(function () { if (!window.__d2e) { d.classList.remove('motion', 'intro'); dispatchEvent(new Event('d2e:intro-reveal')); } }, 3000);
+        }
+        try { if (localStorage.getItem('d2e-paused') === '1') d.setAttribute('data-paused', ''); } catch (e) {}
+      })();
+    </script>
+    {graphs.map((g) => <script type="application/ld+json" set:html={JSON.stringify(g)} />)}
+  </head>
+  <body>
+    <div class="curtain" aria-hidden="true" inert>
+      <div class="intro-panel intro-l"></div>
+      <div class="intro-panel intro-r"></div>
+      <div class="intro-logo">
+        <svg class="intro-echo" viewBox="0 0 326 248" focusable="false"><path pathLength="1" d={RING} /></svg>
+        <i class="intro-pulse"></i><i class="intro-pulse"></i>
+        <div class="intro-core">
+          <img src="/logo-tight.png" width="326" height="248" alt="" decoding="async" />
+          <svg viewBox="0 0 326 248" focusable="false"><path class="intro-ring" pathLength="1" d={RING} /></svg>
+        </div>
+      </div>
+    </div>
+    <div class="progress" aria-hidden="true"></div>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>

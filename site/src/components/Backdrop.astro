@@ -1,0 +1,10 @@
+---
+// Shared animated backdrop. Everything here is decorative and aria-hidden.
+// Ambient layers carry class "amb" so the visible pause button can stop them.
+---
+<div class="backdrop" aria-hidden="true">
+  <div class="glow glow-a amb"></div>
+  <div class="glow glow-b amb"></div>
+  <div class="grid-mask"><div class="grid amb"></div></div>
+</div>
+<button class="motion-toggle" type="button" data-motion-toggle><i aria-hidden="true"></i><span>Pause motion</span></button>

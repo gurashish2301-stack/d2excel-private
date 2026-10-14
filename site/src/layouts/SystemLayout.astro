@@ -1,0 +1,100 @@
+---
+// Page shell for the redesign (direction C). Pages built on it get the navy pill nav, the optional bottom dock,
+// the footer, the logo reveal (first page of a session) and the shared meta tags.
+import '@fontsource-variable/geist/wght.css';
+import '@fontsource-variable/geist-mono/wght.css';
+import '@fontsource/instrument-serif/latin-400-italic.css';
+import '../styles/system/index.css';
+import geist from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import serif from '@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2?url';
+import NavTop from '../components/system/NavTop.astro';
+import NavDock from '../components/system/NavDock.astro';
+import Footer from '../components/system/Footer.astro';
+import { NOINDEX, SITE_NAME, SITE_URL } from '../config';
+
+const { title, description, dock = [], noindex = NOINDEX, footer = true, scripts = true, intro = true, jsonLd = [], ogType = 'website' } = Astro.props;
+const fullTitle = title === SITE_NAME ? `${SITE_NAME} | Start with clear answers. Find the right counselor next.` : `${title} | ${SITE_NAME}`;
+const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+const image = new URL('/og.png', SITE_URL).href;
+const graphs = [{ '@context': 'https://schema.org', '@type': 'Organization', name: SITE_NAME, url: SITE_URL, logo: new URL('/logo.png', SITE_URL).href }, ...jsonLd];
+// The logo's oval ring as one closed path (centre 163,123.5; radii 159.5 x 120), starting at the top: clockwise, and its mirror.
+const RING = 'M163 3.5A159.5 120 0 1 1 163 243.5A159.5 120 0 1 1 163 3.5Z';
+const RING_CCW = 'M163 3.5A159.5 120 0 1 0 163 243.5A159.5 120 0 1 0 163 3.5Z';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#050b24" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="D2Excel logo and the headline Start with clear answers. Find the right counselor next. on a blue background" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" href={geist} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serif} as="font" type="font/woff2" crossorigin />
+    <!-- Runs before first paint. `intro` plays the logo reveal (motion allowed, JavaScript on). With intro={true} it plays on the first page of a
+         session; with intro="arrival" (Home) it plays on every fresh arrival: a direct load, a reload, a new tab or a visit from another site,
+         and is skipped only when the visitor comes from another page of this site (including the logo link). If the page script has not taken
+         over after 3 seconds the gate is removed, so nothing stays hidden or covered. -->
+    <script is:inline define:vars={{ intro, every: intro === 'arrival' }}>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        if (!intro || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        try {
+          if (every) {
+            var ref = document.referrer, nav = performance.getEntriesByType('navigation')[0], inside = false;
+            try { inside = !!ref && new URL(ref).origin === location.origin; } catch (e) {}
+            // a reload counts as an arrival (the referrer survives a reload), unless the "reload" is a click on the link to this same page
+            if (inside && !(nav && nav.type === 'reload' && ref !== location.href)) { sessionStorage.setItem('d2e-intro', '1'); return; }
+          } else if (sessionStorage.getItem('d2e-intro')) return;
+          sessionStorage.setItem('d2e-intro', '1');
+          d.classList.add('intro');
+          window.__intro0 = performance.now();
+          var early = function () { if (!window.__introGo) { d.classList.remove('intro'); dispatchEvent(new Event('d2e:intro-reveal')); } };
+          addEventListener('pointerdown', early, { once: true });
+          addEventListener('keydown', early, { once: true });
+          setTimeout(function () { if (!window.__d2e) { d.classList.remove('intro'); dispatchEvent(new Event('d2e:intro-reveal')); } }, 3000);
+        } catch (e) {}
+      })();
+    </script>
+    {graphs.map((g) => <script type="application/ld+json" set:html={JSON.stringify(g)} />)}
+  </head>
+  <body class="theme-dark">
+    {intro && (
+      <div class="curtain" aria-hidden="true">
+        <div class="intro-panel intro-l"></div>
+        <div class="intro-panel intro-r"></div>
+        <div class="intro-logo">
+          <svg class="intro-echo" viewBox="0 0 326 248" focusable="false"><path class="e-blue" pathLength="1" d={RING} /><path class="e-red" pathLength="1" d={RING_CCW} /></svg>
+          <i class="intro-pulse"></i>
+          <div class="intro-core">
+            <img src="/logo-tight.png" width="326" height="248" alt="" decoding="async" />
+            <svg viewBox="0 0 326 248" focusable="false"><path class="intro-ring" pathLength="1" d={RING} /></svg>
+          </div>
+        </div>
+      </div>
+    )}
+    <a class="skip-link" href="#main">Skip to content</a>
+    <NavTop />
+    <main id="main"><slot /></main>
+    {footer && <Footer />}
+    {dock.length > 0 && <NavDock items={dock} />}
+    {scripts && <script>import '../scripts/system.ts';</script>}
+  </body>
+</html>

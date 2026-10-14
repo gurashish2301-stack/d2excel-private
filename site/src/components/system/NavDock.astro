@@ -1,0 +1,6 @@
+---
+const { items, label = 'On this page' } = Astro.props;
+---
+<nav class="nav-dock" aria-label={label}>
+  {items.map((i) => <a href={i.href}>{i.label}</a>)}
+</nav>

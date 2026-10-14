@@ -1,0 +1,16 @@
+---
+// A light band for reading. `id` is required (dock target and heading id). Title goes in the `title` slot so it can carry one accent word.
+// tone: 'paper' (default) or 'tint' (a shade warmer, to break up a long page). rails: faint dashed column lines behind the band.
+// split: head on the left, content on the right from 56rem. seam: rounded top that overlaps the band above (the first light band after a dark one).
+const { id, eyebrow, lede, tone = 'paper', rails = false, split = false, seam = false } = Astro.props;
+---
+<section id={id} class:list={['section inner-sec theme-light', seam && 'seam-top', tone === 'tint' && 'is-tint', rails && 'rails', split && 'is-split']} aria-labelledby={`${id}-title`}>
+  <div class="wrap inner-wrap">
+    <header class="section-head rise">
+      {eyebrow && <p class="mono">{eyebrow}</p>}
+      <h2 id={`${id}-title`}><slot name="title" /></h2>
+      {lede && <p class="lede">{lede}</p>}
+    </header>
+    <slot />
+  </div>
+</section>

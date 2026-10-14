@@ -1,0 +1,20 @@
+---
+import Backdrop from './Backdrop.astro';
+import Orbits from './Orbits.astro';
+const { title, lede, compact = false, crumbs } = Astro.props;
+---
+<section class:list={['page-hero', compact && 'compact']}>
+  <Backdrop />
+  {!compact && <Orbits />}
+  <div class="wrap">
+    {crumbs && (
+      <nav aria-label="Breadcrumb">
+        <ol class="crumbs">
+          {crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
+        </ol>
+      </nav>
+    )}
+    <h1>{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+  </div>
+</section>

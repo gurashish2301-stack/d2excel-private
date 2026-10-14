@@ -1,0 +1,70 @@
+---
+import InnerLayout from '../layouts/InnerLayout.astro';
+import InnerHero from '../components/system/InnerHero.astro';
+import InnerSection from '../components/system/InnerSection.astro';
+import FeatureRow from '../components/system/FeatureRow.astro';
+import InnerAsk from '../components/system/InnerAsk.astro';
+
+// Copy comes from Pioneer's sourced draft (about-copy-draft.md); only sentences that carry a source there are used, and the tags are not shown.
+const dock = [
+  { href: '#why', label: 'Why' },
+  { href: '#principles', label: 'Principles' },
+  { href: '#now', label: 'Where we are' },
+  { href: '#join', label: 'Join' },
+];
+---
+<InnerLayout
+  title="About"
+  description="D2Excel (Desire2Excel) is building a marketplace that connects students with college admissions counselors, starting in California."
+  dock={dock}
+>
+  <InnerHero
+    eyebrow={['About', 'Launching in California']}
+    title={{ lead: 'Someone in your corner who actually', accent: 'knows you', punct: '.', tail: '' }}
+    lede="D2Excel, short for Desire2Excel, is building a marketplace that connects students with college admissions counselors, starting in California."
+    primary={{ href: '/guides/', label: 'Read the guides' }}
+    secondary={{ href: '/how-it-works/', label: 'How it works' }}
+  >
+    <Fragment slot="art">
+      <div class="about-mark arrive" style="--i:4">
+        <span class="logo-plate"><img src="/logo-tight.png" width="326" height="248" alt="" /></span>
+      </div>
+    </Fragment>
+  </InnerHero>
+
+  <InnerSection id="why" seam rails split>
+    <Fragment slot="title">Why we are building it.</Fragment>
+    <div class="why">
+      <p class="why-lead rise">Every high schooler working out what comes after graduation should have someone in their corner who actually knows them, not just a generic search result.</p>
+      <p class="rise">So we are starting with the student. We want to give students a trustworthy home base for college and career planning from day one, one that is useful on its own, before any counselor is involved.</p>
+      <p class="rise">And when general guidance stops being enough, we want to give students a path to a real advisor. Parents come right after students in how we think about this, because family trust is what the whole platform depends on.</p>
+    </div>
+  </InnerSection>
+
+  <InnerSection id="principles" tone="tint">
+    <Fragment slot="title">What we hold ourselves to.</Fragment>
+    <div class="bento bento-4">
+      <FeatureRow status="none" icon="people" tile="tile-blue" title="Students come first.">
+        <p>The student gets real value on their own before a counselor is ever involved.</p>
+      </FeatureRow>
+      <FeatureRow status="none" icon="compass" tile="tile-sky" title="Trust travels through people you already trust.">
+        <p>We would rather families know our name because a school or counselor they rely on pointed them our way than because an ad found them.</p>
+      </FeatureRow>
+      <FeatureRow status="none" icon="book" tile="tile-sand" title="Point to the official source.">
+        <p>Admission rules need to be right, so our guides cite and link to official sources instead of standing alone as the authority.</p>
+      </FeatureRow>
+      <FeatureRow status="none" icon="check" tile="tile-blue" title="Say what is true today.">
+        <p>We state only what is true of D2Excel today, with no invented numbers, testimonials or outcomes.</p>
+      </FeatureRow>
+    </div>
+  </InnerSection>
+
+  <InnerSection id="now" split>
+    <Fragment slot="title">Where we are now.</Fragment>
+    <p class="now-line">We are early. Our guides on applying to college, entrance exams, financial aid and choosing a major are <strong>live</strong>, and the counselor marketplace is <strong>planned</strong>.</p>
+  </InnerSection>
+
+  <InnerAsk lede="The guides are live. Tell us who you are and we will keep you posted as the rest opens." cta={{ href: '/join/', label: 'Join the waitlist' }}>
+    <Fragment slot="title">Get on the <span class="accent">sign-up list</span>.</Fragment>
+  </InnerAsk>
+</InnerLayout>

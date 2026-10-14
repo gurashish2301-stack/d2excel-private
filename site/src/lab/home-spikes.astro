@@ -1,0 +1,42 @@
+---
+// Spike: the headline mark (3 variants) and the story stack (3 variants). Private lab page. ?s=a|b|c picks the stack variant.
+import SystemLayout from '../layouts/SystemLayout.astro';
+import '../styles/system/home.css';
+import '../styles/system/lab.css';
+const steps = [['Explore', 'sc-blue'], ['Apply', 'sc-sky'], ['Decide', 'sc-sand'], ['Get help', 'sc-ink']];
+const marks = [
+  ['a', 'Oval drawn around the phrase (kept)'],
+  ['b', 'Hand underline'],
+  ['c', 'Marker highlight under the phrase'],
+];
+---
+<SystemLayout intro={false} title="Spike: home marks and stack" description="Private design lab." noindex footer={false}>
+  <section class="section theme-dark glow-field" style="padding-top:7rem">
+    <div class="wrap stack-lg">
+      {marks.map(([v, label]) => (
+        <div class="mark" data-m={v}>
+          <p class="mono">Mark {v}: {label}</p>
+          <h1 class="display hero-title" style="margin-top:.75rem">Find the <span class="accent-wrap"><span class="accent">right counselor</span>
+            <svg class="scribble" viewBox="0 0 500 110" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M92 20C172 6 382 4 452 24C494 38 490 80 422 94C342 108 142 108 72 90C16 76 12 36 82 20C152 6 302 4 382 14" /></svg>
+            <svg class="under" viewBox="0 0 500 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M6 24C80 10 150 30 240 18C320 8 400 28 494 14" /></svg>
+            <i class="hl" aria-hidden="true"></i>
+          </span> next.</h1>
+        </div>
+      ))}
+    </div>
+  </section>
+  <section class="section theme-dark glow-field-soft" id="stack" style="padding-top:2rem">
+    <div class="wrap">
+      <p class="mono" style="margin-bottom:1rem">Stack variant <span id="sv">a</span> (links: ?s=a, ?s=b, ?s=c)</p>
+      <ol class="steps" data-s="a">
+        {steps.map(([t, c], i) => (
+          <li class="step" style={`--n:${i}`}><div class={`step-card ${c}`}><div class="sc-copy stack"><p class="mono">{t}</p><h3>Step card {t}</h3><p>Placeholder beat to compare how the stack arrives.</p></div><div class="sc-panel theme-light"><p class="mono">Panel</p><p>One real, dated panel sits here.</p></div></div></li>
+        ))}
+      </ol>
+      <div style="height:60vh"></div>
+    </div>
+  </section>
+  <script is:inline>
+    (function(){var v=new URLSearchParams(location.search).get('s')||'a';document.querySelector('.steps').dataset.s=v;document.getElementById('sv').textContent=v;})();
+  </script>
+</SystemLayout>

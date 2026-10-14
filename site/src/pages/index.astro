@@ -1,0 +1,343 @@
+---
+import { getCollection } from 'astro:content';
+import SystemLayout from '../layouts/SystemLayout.astro';
+import GuideWall from '../components/system/GuideWall.astro';
+import Icon from '../components/system/Icon.astro';
+import '../styles/system/home.css';
+import { SITE_NAME, SITE_URL, fmtMonth, sortGuides, categoryLook } from '../config';
+
+const guides = sortGuides(await getCollection('guides'));
+const byId = Object.fromEntries(guides.map((g) => [g.id, g]));
+const uc = byId['uc-application'], money = byId['college-money'];
+const lv = (g) => fmtMonth(g.data.lastVerified);
+const lvLong = fmtMonth(uc.data.lastVerified, true);
+
+// Headline split into words so each can settle in on its own (text stays fully visible the whole time)
+const lead = 'Start with clear answers. Find the'.split(' ');
+const tail = ['next.'];
+
+const dock = [
+  { href: '#guides', label: 'Guides' },
+  { href: '#paths', label: 'Your path' },
+  { href: '#story', label: 'The plan' },
+  { href: '#facts', label: 'Facts' },
+  { href: '#join', label: 'Join' },
+];
+
+// Deadline-driven guides lead. Dates come from the guides' source articles (see website-brief.md section 4.5).
+const deadline = [
+  { g: uc, dates: [['Application window', 'Oct 1 to Nov 30, 2026']] },
+  { g: money, dates: [['FAFSA', 'Check studentaid.gov for the current FAFSA opening date'], ['Cal Grant', 'Deadline Mar 2, 2027']] },
+].map((d) => ({ ...d, ...categoryLook(d.g.data.category) }));
+const rest = ['sat-or-act', 'major-worth', 'ai-and-your-application', 'choose-a-counselor'].map((id) => ({ g: byId[id], ...categoryLook(byId[id].data.category) }));
+const picks = [byId['sat-or-act'], uc, money];
+const questions = [
+  { q: 'When is the UC deadline?', href: '/guides/uc-application/' },
+  { q: 'Does UC look at SAT or ACT scores?', href: '/guides/sat-or-act/' },
+  { q: 'Where does college money come from?', href: '/guides/college-money/' },
+  { q: 'How do I choose a counselor?', href: '/guides/choose-a-counselor/' },
+];
+// A hand-drawn ring: an ellipse traced a little more (or less) than once, with a slow drift in radius so the end overshoots the
+// start. Built here, at build time, as a smooth cubic path in a 1000 x 500 box. CSS tilts the whole box (see .oval in home.css).
+function loop(rx, ry, start = 200, turns = 1.07, drift = 0.045, wob = 0.015) {
+  const N = Math.round(24 * turns);
+  const P = Array.from({ length: N + 1 }, (_, k) => {
+    const t = k / N, a = ((start + 360 * turns * t) * Math.PI) / 180, m = 1 + drift * t + wob * Math.sin(3 * a);
+    return [500 + rx * m * Math.cos(a), 250 + ry * m * Math.sin(a)];
+  });
+  let d = `M${P[0][0].toFixed(1)} ${P[0][1].toFixed(1)}`;
+  for (let i = 0; i < N; i++) {
+    const [p0, p1, p2, p3] = [P[i - 1] ?? P[i], P[i], P[i + 1], P[i + 2] ?? P[i + 1]];
+    const f = (v) => v.toFixed(1);
+    d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d;
+}
+// one big ring behind the headline block (variants a: single, b: two ovals, c: broken were compared in shots/round4-home/variants)
+const ovalPath = loop(470, 226, 205, 1.07, 0.04);
+const later = [
+  { t: 'Find a counselor', d: 'Search counselors and see why each one might fit you.' },
+  { t: 'Student accounts', d: 'A place to keep your plans, goals, and deadlines together.' },
+  { t: 'Counselor profiles', d: 'A page where counselors share how they work and who they help.' },
+];
+---
+<SystemLayout
+  title={SITE_NAME}
+  description="A marketplace connecting students with college admissions counselors, launching in California. Read the guides and join the waitlist."
+  jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME, url: SITE_URL }]}
+  dock={dock}
+  intro="arrival"
+>
+  <!-- 1. Hero: the lit oval, a wall of real guides, one dated item -->
+  <section class="stage hero theme-dark glow-field tex-dots" data-v="a" aria-labelledby="hero-title">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <div class="hero-head">
+          <svg class="oval" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <defs><linearGradient id="oval-g" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="960" y2="0"><stop offset="0" class="s-red" /><stop offset="0.38" class="s-mix" /><stop offset="0.7" class="s-blue" /><stop offset="1" class="s-blue2" /></linearGradient></defs>
+            <path pathLength="1" d={ovalPath} stroke="url(#oval-g)" />
+          </svg>
+          <p class="hero-eyebrow arrive" style="--i:0"><span class="mono">Launching in California</span><span class="mono pt" data-pt-time hidden></span></p>
+          <h1 id="hero-title" class="display hero-title">
+            {lead.map((w, i) => <><span class="w arrive" style={`--i:${i}`}>{w}</span>{' '}</>)}<span class="accent-wrap"><span class="accent w arrive" style={`--i:${lead.length}`}>right counselor</span></span>{' '}{tail.map((w, i) => <span class="w arrive" style={`--i:${lead.length + 1 + i}`}>{w}</span>)}
+          </h1>
+          <p class="lede arrive" style="--i:7">Plain-language, sourced college guides for California students, free today. A way to find a counselor who fits is on the way.</p>
+        </div>
+        <div class="row arrive" style="--i:8">
+          <a class="btn btn-primary" href="/guides/">Read the guides <Icon name="arrow" /></a>
+          <a class="btn btn-glass" href="/join/">Join the waitlist</a>
+        </div>
+        <nav class="quick arrive" style="--i:9" aria-label="Start with a question">
+          <p class="mono">Start with a question</p>
+          <ul class="row">
+            {questions.map((c) => <li><a class="chip" href={c.href}>{c.q}</a></li>)}
+          </ul>
+        </nav>
+      </div>
+      <div class="hero-stage">
+        <GuideWall guides={guides} />
+        <div class="notify arrive" role="group" aria-label="A dated item from D2Excel">
+          <p class="mono"><span>From: D2Excel</span><span class="now">Now</span></p>
+          <strong><a href="/guides/uc-application/">UC application: Oct 1 to Nov 30, 2026</a></strong>
+          <p>From our UC application guide, last verified {lvLong}. Confirm on the official page.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Guides: the ones with a date lead -->
+  <section id="guides" class="section seam-top theme-light" aria-labelledby="guides-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">Guides, free to read today</p>
+        <h2 id="guides-title">Start with the guides that have a <span class="accent">date</span>.</h2>
+        <p class="lede">Short, plain-language articles on the big decisions in the college process, each with its sources and the month it was last checked.</p>
+      </div>
+      <div class="guide-grid">
+        {deadline.map(({ g, tile, icon, dates }) => (
+          <article class={`tile guide-tile guide-lead ${tile} reveal`}>
+            <Icon class="glyph" name={icon} stroke={1.5} />
+            <div class="stack">
+              <p class="mono tile-mono">{g.data.category}</p>
+              <h3><a class="stretch" href={`/guides/${g.id}/`}>{g.data.title}</a></h3>
+              <dl class="dates">
+                {dates.map(([k, v]) => <div><dt class="mono">{k}</dt><dd>{v}</dd></div>)}
+              </dl>
+            </div>
+            <p class="mono tile-mono tile-foot"><span>Last verified {lv(g)}</span><span class="go">Read the guide</span></p>
+          </article>
+        ))}
+        {rest.map(({ g, tile, icon }) => (
+          <article class={`tile guide-tile ${tile} reveal`}>
+            <Icon class="glyph" name={icon} stroke={1.5} />
+            <div class="stack">
+              <p class="mono tile-mono">{g.data.category}</p>
+              <h3><a class="stretch" href={`/guides/${g.id}/`}>{g.data.title}</a></h3>
+            </div>
+            <p class="mono tile-mono">Last verified {lv(g)}</p>
+          </article>
+        ))}
+      </div>
+      <p class="more"><a class="link-arrow" href="/guides/">All {guides.length} guides <Icon name="arrow" /></a></p>
+    </div>
+  </section>
+
+  <!-- 3. Role router -->
+  <section id="paths" class="section paths theme-light" aria-labelledby="paths-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="paths-title">Where are you in the <span class="accent">process</span>?</h2>
+        <p class="lede">Pick the door that fits. Each one starts with something you can read now.</p>
+      </div>
+      <div class="role-grid">
+        <article class="tile role role-student tile-blue">
+          <Icon class="glyph" name="compass" stroke={1.5} />
+          <div class="stack">
+            <p class="mono tile-mono">Student</p>
+            <h3><a class="stretch" href="/for-students/">I am figuring out where to apply.</a></h3>
+            <p>Guides on applications, testing, majors, and paying for college.</p>
+          </div>
+          <p class="mono tile-mono go">For students</p>
+        </article>
+        <article class="tile role role-parent tile-sand">
+          <Icon class="glyph" name="book" stroke={1.5} />
+          <div class="stack">
+            <p class="mono tile-mono">Parent</p>
+            <h3><a class="stretch" href="/guides/choose-a-counselor/">I am helping my student choose.</a></h3>
+            <p>Read how to choose a counselor, including where D2Excel has a stake.</p>
+          </div>
+          <p class="mono tile-mono go">Read the guide</p>
+        </article>
+        <article class="tile role role-counselor tile-ink">
+          <Icon class="glyph" name="people" stroke={1.5} />
+          <div class="stack">
+            <p class="mono tile-mono">Counselor</p>
+            <h3><a class="stretch" href="/for-counselors/">I want to shape this early.</a></h3>
+            <p>We are starting to build the counselor network. Tell us you are interested.</p>
+          </div>
+          <p class="mono tile-mono go">For counselors</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Story: a stack of step cards, one revealed per scroll beat -->
+  <section id="story" class="story section seam-top theme-dark glow-field-soft" aria-labelledby="story-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">The plan</p>
+        <h2 id="story-title">One path, from the first question to the <span class="accent">right help</span>.</h2>
+        <p class="lede">Explore, apply and decide work today, as guides. The fourth step is still being built, and we mark it that way.</p>
+      </div>
+      <ol class="steps">
+        <li class="step" style="--n:0">
+          <div class="step-card sc-blue">
+            <div class="sc-copy stack">
+              <p class="mono">Explore</p>
+              <h3>Read before you decide.</h3>
+              <p>Plain-language guides on applications, testing, majors, and funding.</p>
+              <p class="mono sc-live">Live today</p>
+            </div>
+            <div class="sc-panel theme-light">
+              <ul class="mini-cards">
+                {picks.map((g) => (
+                  <li><a class="mini" href={`/guides/${g.id}/`}>
+                    <span class="mono">{g.data.category}</span>
+                    <span class="mini-title">{g.data.title}</span>
+                    <span class="mono lv">Last verified {lv(g)}</span>
+                  </a></li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>
+        <li class="step" style="--n:1">
+          <div class="step-card sc-sky">
+            <div class="sc-copy stack">
+              <p class="mono">Apply</p>
+              <h3>Know what is due, and when.</h3>
+              <p>Dates and sources you can check, in one place.</p>
+              <p class="mono sc-live">Live today</p>
+            </div>
+            <div class="sc-panel theme-light">
+              <p class="mono">Key dates, 2026-27</p>
+              <dl class="date-list">
+                <div><dt>UC application window</dt><dd>Oct 1 to Nov 30, 2026</dd></div>
+                <div><dt>FAFSA</dt><dd>Check studentaid.gov for the current FAFSA opening date</dd></div>
+                <div><dt>Cal Grant deadline</dt><dd>Mar 2, 2027</dd></div>
+              </dl>
+              <p class="mono lv">From the UC application and college money guides, last verified {lvLong}</p>
+              <p class="small">Dates change every cycle. Confirm on the official page before you act.</p>
+            </div>
+          </div>
+        </li>
+        <li class="step" style="--n:2">
+          <div class="step-card sc-sand">
+            <div class="sc-copy stack">
+              <p class="mono">Decide</p>
+              <h3>Weigh your options with a clearer picture.</h3>
+              <p>Side-by-side tables in the guides, so a rule is easy to compare.</p>
+              <p class="mono sc-live">Live today</p>
+            </div>
+            <div class="sc-panel theme-light">
+              <p class="mono">Adapted from the SAT or ACT guide</p>
+              <div class="table-wrap">
+                <table class="mini-table">
+                  <caption class="sr-only">Which colleges look at test scores</caption>
+                  <thead><tr><th scope="col">School system</th><th scope="col">Test scores</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">University of California</th><td>Not looked at</td></tr>
+                    <tr><th scope="row">California State University</th><td>Not looked at</td></tr>
+                    <tr><th scope="row">Other colleges</th><td>Varies by school</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="mono lv">Last verified {fmtMonth(byId['sat-or-act'].data.lastVerified, true)}. <a href="/guides/sat-or-act/">Read the guide</a></p>
+            </div>
+          </div>
+        </li>
+        <li class="step" style="--n:3">
+          <div class="step-card sc-ink">
+            <div class="sc-copy stack">
+              <p class="mono">Get help</p>
+              <h3>Find a counselor who fits, and see why.</h3>
+              <p>Matched, not assigned. This is the plan, not a live product yet.</p>
+              <p class="mono sc-live">Planned</p>
+            </div>
+            <div class="sc-panel sc-panel-soon theme-dark">
+              <p class="mono">Planned</p>
+              <strong>Counselor matching</strong>
+              <p>Not available yet. Join the waitlist to hear first.</p>
+              <a class="btn btn-glass btn-sm" href="/join/">Join the waitlist</a>
+            </div>
+          </div>
+        </li>
+        <li class="step step-end" style="--n:4">
+          <div class="step-card sc-end">
+            <i class="end-ring" aria-hidden="true"></i>
+            <h3>Where it goes from here is <span class="accent">up to you</span>.</h3>
+            <p>Start with a guide today, or tell us what you would want from a counselor.</p>
+            <div class="row">
+              <a class="btn btn-primary" href="/guides/">Read the guides <Icon name="arrow" /></a>
+              <a class="link-arrow" href="/how-it-works/">Walk through it step by step <Icon name="arrow" /></a>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5. How we check facts: a guide's anatomy -->
+  <section id="facts" class="section facts seam-top theme-light" aria-labelledby="facts-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="mono">How we check facts</p>
+        <h2 id="facts-title">Every guide <span class="accent">shows its work</span>.</h2>
+        <p class="lede">A guide that gets a date wrong can cost a student a deadline, so each one names its sources and says when it was last checked.</p>
+      </div>
+      <div class="anatomy">
+        <figure class="anat-page" aria-label="Example: the parts of the University of California application guide">
+          <p class="mono anat-topic">Applications</p>
+          <p class="anat-title">University of California application</p>
+          <div class="anat-block anat-answer"><span class="anat-tag mono">Quick answer</span><p>The UC application window runs Oct 1 to Nov 30, 2026.</p></div>
+          <div class="anat-block"><span class="anat-tag mono">Key dates</span><p>What is due and when, in a short table.</p></div>
+          <div class="anat-block"><span class="anat-tag mono">Sources and where to verify</span><p>The official page for each date and rule.</p></div>
+          <div class="anat-block anat-lv"><span class="anat-tag mono">Last verified</span><p class="mono">{lvLong}</p></div>
+        </figure>
+        <ol class="anat-list">
+          <li><h3>Quick answer first</h3><p>The direct answer sits at the top, in plain words, before any detail.</p></li>
+          <li><h3>Guides with deadlines list them in a table.</h3><p>Deadlines and windows are listed where you can scan them.</p></li>
+          <li><h3>Sources you can check</h3><p>Each guide names where to confirm a date or rule before you act on it.</p></li>
+          <li><h3>Last verified</h3><p>The month we last checked it. Deadlines and aid rules change every cycle, so confirm on the official page before you act.</p></li>
+          <li><h3>Straight about our stake</h3><p>D2Excel is a marketplace, and we say so, including in our own guide on choosing a counselor.</p></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. One ask -->
+  <section id="join" class="section ask seam-top theme-dark glow-field" aria-labelledby="join-title">
+    <div class="wrap ask-grid">
+      <div class="stack-lg">
+        <p class="mono">Be first to know</p>
+        <h2 id="join-title">Be first to know when D2Excel <span class="accent">opens</span>.</h2>
+        <p class="lede">The guides are live. What we are building next is not, and the waitlist is how you hear first.</p>
+        <div class="row">
+          <a class="btn btn-primary" href="/join/">Join the waitlist <Icon name="arrow" /></a>
+        </div>
+      </div>
+      <div>
+        <p class="mono ask-note">None of these exist yet</p>
+        <ul class="later">
+          {later.map((l) => (
+            <li class="later-item">
+              <span class="chip chip-mono">Planned</span>
+              <h3>{l.t}</h3>
+              <p>{l.d}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+</SystemLayout>

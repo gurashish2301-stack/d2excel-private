@@ -1,0 +1,13 @@
+---
+// Teasers only. These are not links and not buttons on purpose: none of this exists yet.
+const { items } = Astro.props;
+---
+<ul class="soon">
+  {items.map((i) => (
+    <li class="reveal">
+      <span class="badge">Coming soon</span>
+      <h3>{i.title}</h3>
+      <p>{i.text}</p>
+    </li>
+  ))}
+</ul>

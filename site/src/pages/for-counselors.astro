@@ -1,0 +1,98 @@
+---
+import InnerLayout from '../layouts/InnerLayout.astro';
+import InnerHero from '../components/system/InnerHero.astro';
+import InnerSection from '../components/system/InnerSection.astro';
+import FeatureRow from '../components/system/FeatureRow.astro';
+import InnerAsk from '../components/system/InnerAsk.astro';
+import Icon from '../components/system/Icon.astro';
+
+const dock = [
+  { href: '#why', label: 'Why join early' },
+  { href: '#expect', label: 'What we expect' },
+  { href: '#join', label: 'Join' },
+];
+---
+<InnerLayout
+  title="For independent college counselors in California"
+  description="D2Excel is inviting independent college counselors in California to express interest ahead of launch. Nothing for counselors is live yet."
+  dock={dock}
+>
+  <InnerHero
+    eyebrow={['For counselors', 'Launching in California']}
+    title={{ lead: 'Help build the marketplace for', accent: 'independent', punct: '', tail: ' counselors.' }}
+    lede="Launching in California. Nothing for counselors is live yet. Tell us about your practice and we will follow up."
+    primary={{ href: '/join/?role=counselor', label: 'Join the counselor waitlist' }}
+    secondary={{ href: '/guides/', label: 'Browse the college guides' }}
+    note="Planned means not built yet."
+  >
+    <Fragment slot="art">
+      <div class="bridge">
+        <div class="card arrive" style="--i:4">
+          <span class="mono st st-live">Live today</span>
+          <strong>Guides for students and parents</strong>
+        </div>
+        <div class="bridge-mid arrive" style="--i:5">
+          <i class="bridge-link"></i>
+          <span class="logo-plate"><img src="/logo-tight.png" width="326" height="248" alt="" /></span>
+          <i class="bridge-link is-plan"></i>
+        </div>
+        <div class="card plan-card arrive" style="--i:6">
+          <span class="mono st st-plan">Planned</span>
+          <strong>Counselors, listed on D2Excel</strong>
+        </div>
+      </div>
+    </Fragment>
+  </InnerHero>
+
+  <InnerSection id="why" seam rails lede="An independent college counselor is a private adviser, not a school employee. Early counselors can help shape how D2Excel works.">
+    <Fragment slot="title">Why independent counselors can join early.</Fragment>
+    <div class="bento">
+      <FeatureRow status="plan" icon="people" tile="tile-blue" title="Be listed next to the guides" link={{ href: '/guides/', label: 'Browse the college guides' }}>
+        <p>D2Excel publishes guides that help students and parents understand the process. The plan is to list independent counselors next to the guides.</p>
+        <Fragment slot="art">
+          <ol class="flow">
+            <li class="is-live"><strong>Guides for students and parents</strong><span class="mono st st-live">Live today</span></li>
+            <li><strong>A family looks for a counselor</strong></li>
+            <li class="is-plan"><strong>Your profile is listed</strong><span class="mono st st-plan">Planned</span></li>
+          </ol>
+        </Fragment>
+      </FeatureRow>
+
+      <FeatureRow status="plan" icon="check" tile="tile-sky" title="Stay independent">
+        <p>The plan is for counselors to stay independent. D2Excel is a marketplace (a place where families and counselors find each other), not an employer. Terms will be shared when counselor sign-up opens.</p>
+        <Fragment slot="art">
+          <div class="own">
+            <div class="oval"><strong>Your practice</strong><span>Independent</span></div>
+            <div class="pill"><strong>D2Excel</strong><span>A marketplace, not an employer</span></div>
+          </div>
+        </Fragment>
+      </FeatureRow>
+
+      <FeatureRow wide status="plan" icon="compass" tile="tile-sand" title="Describe how you work">
+        <p>A profile is planned so families can read who you work with and how. It is a place to start a conversation.</p>
+        <Fragment slot="art">
+          <div class="venn">
+            <i class="oval oval-a"></i><i class="oval oval-b"></i>
+            <span>Who you work with best</span>
+            <p class="both">Start a conversation</p>
+            <span>What a family is looking for</span>
+          </div>
+        </Fragment>
+      </FeatureRow>
+    </div>
+  </InnerSection>
+
+  <InnerSection id="expect" tone="tint" split lede="This is the current plan and it may change. Details will be shared when counselor sign-up opens.">
+    <Fragment slot="title">What we expect to ask for.</Fragment>
+    <ul class="asks">
+      <li><h3>A short application</h3><p>Tell us about your practice, your experience, and the students you help.</p></li>
+      <li><h3>A background check</h3><p>We expect to ask for this before a counselor is listed.</p></li>
+      <li><h3>Professional insurance</h3><p>Liability insurance before a counselor is listed.</p></li>
+    </ul>
+  </InnerSection>
+
+  <InnerAsk lede="We are inviting counselors to express interest ahead of launch. Tell us about your practice and we will follow up." cta={{ href: '/join/?role=counselor', label: 'Join the counselor waitlist' }}>
+    <Fragment slot="title">Tell us about your <span class="accent">practice</span>.</Fragment>
+    Not a counselor? See <a href="/for-students/">what D2Excel offers students</a>, or <a href="/how-it-works/">how it is designed to work</a>.
+  </InnerAsk>
+</InnerLayout>

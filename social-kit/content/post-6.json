@@ -1,0 +1,13 @@
+{
+  "_note": "Batch 2 post 6, first-generation students. Graphic text from linkedin-posts-batch-2.md; source line from the post's own Source line. Data is from 2012-13, a marker not a current figure.",
+  "template": "a",
+  "verified": true,
+  "title": "The counselor conversation gap",
+  "stat": "2012-13: meeting a counselor about college",
+  "spokes": [
+    { "icon": "book", "heading": "72%", "body": "First-generation students" },
+    { "icon": "cap", "heading": "82%", "body": "Students with a bachelor's-degree parent" },
+    { "icon": "scales", "heading": "10 points", "body": "A head-start gap, not an ambition gap" }
+  ],
+  "source": "Source: National Center for Education Statistics, NCES 2023-097, Aug 2023 (2012-13 data)."
+}

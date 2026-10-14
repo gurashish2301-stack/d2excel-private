@@ -1,0 +1,12 @@
+---
+import Arrow from './Arrow.astro';
+const { title = 'Be first to know when D2Excel opens.', text = 'Join the waitlist and we will let you know as the marketplace and new guides roll out.', label = 'Join the waitlist', href = '/join/' } = Astro.props;
+---
+<section class="cta section" aria-labelledby="cta-title">
+  <div class="ring-deco" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wrap reveal">
+    <h2 id="cta-title">{title}</h2>
+    <p>{text}</p>
+    <a class="btn light" href={href}>{label} <Arrow /></a>
+  </div>
+</section>

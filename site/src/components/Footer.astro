@@ -1,0 +1,33 @@
+---
+import { NAV } from '../config';
+import Logo from './Logo.astro';
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a class="brand" href="/" aria-label="D2Excel home"><Logo plate height={56} /></a>
+        <p>A marketplace connecting students with college admissions counselors, launching in California.</p>
+      </div>
+      <nav class="footer-col" aria-label="Footer">
+        <h2>Explore</h2>
+        <ul>
+          {NAV.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          <li><a href="/join/">Join the waitlist</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="Legal">
+        <h2>Legal</h2>
+        <!-- PLACEHOLDER LEGAL LINKS: the pages exist but contain no real policy text yet. -->
+        <ul>
+          <li><a href="/privacy/">Privacy policy</a></li>
+          <li><a href="/terms/">Terms of use</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="footer-base">
+      <p>Demo site with placeholder content. Nothing here is final.</p>
+      <p>&copy; 2026 D2Excel</p>
+    </div>
+  </div>
+</footer>

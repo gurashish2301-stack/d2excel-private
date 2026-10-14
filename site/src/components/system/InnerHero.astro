@@ -1,0 +1,27 @@
+---
+// Dark hero for inner pages: mono eyebrow, H1 (title = { lead, accent, punct, tail }: one serif-italic word or short phrase, with a
+// hand-drawn oval), lede, one primary and one optional secondary action, an optional one-line `note` under them (the key to the page's status words), and the lit oval ring on the right. Put the page's own art in the `art` slot
+// (it is decorative and aria-hidden, so never put the only copy of a fact in it).
+import Icon from './Icon.astro';
+const { eyebrow = [], title, lede, primary, secondary, note } = Astro.props;
+---
+<!-- Marks pages that will split the headline into words (src/scripts/inner.ts): later visits with motion allowed. Sits before the section, not inside it: a script inside the copy lets the browser paint a half-streamed hero and shift it. -->
+      <script is:inline>(function(d){if(!d.classList.contains('intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('split')})(document.documentElement)</script>
+<section class="ih stage theme-dark glow-field tex-dots" aria-labelledby="ih-title">
+  <div class="wrap ih-grid">
+    <div class="ih-copy">
+      <p class="mono ih-eyebrow arrive" style="--i:0">{eyebrow.map((e, i) => <>{i > 0 && <span aria-hidden="true"> / </span>}{e}</>)}</p>
+      <h1 id="ih-title" class="ih-title arrive w" style="--i:1">{title.lead} <span class="nw"><span class="accent-wrap"><span class="accent">{title.accent}</span><svg class="scribble" viewBox="0 0 500 110" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="arrive" pathLength="1" style="--i:9" d="M92 20C172 6 382 4 452 24C494 38 490 80 422 94C342 108 142 108 72 90C16 76 12 36 82 20C152 6 302 4 382 14" /></svg></span>{title.punct}</span>{title.tail}</h1>
+      <p class="lede arrive" style="--i:2">{lede}</p>
+      <div class="row ih-actions arrive" style="--i:3">
+        <a class="btn btn-primary" data-magnet href={primary.href}>{primary.label} <Icon name="arrow" /></a>
+        {secondary && <a class="btn btn-glass" href={secondary.href}>{secondary.label}</a>}
+      </div>
+      {note && <p class="small ih-note arrive" style="--i:3">{note}</p>}
+    </div>
+    <div class="ih-art" aria-hidden="true">
+      <i class="ring-halo"></i><i class="ring"></i><i class="ring-ember"></i>
+      <slot name="art" />
+    </div>
+  </div>
+</section>
